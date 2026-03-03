@@ -1,0 +1,788 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector", schema: "public")]
+}
+
+// =========================================
+// USERS
+// =========================================
+
+enum UserRole {
+  CLIENT
+  SPECIALIST
+  ADMIN
+}
+
+enum AuthProvider {
+  EMAIL
+  PHONE
+  GOOGLE
+  VK
+}
+
+model User {
+  id            String       @id @default(cuid())
+  email         String?      @unique
+  phone         String?      @unique
+  passwordHash  String?      @map("password_hash")
+  role          UserRole
+  authProvider  AuthProvider  @default(EMAIL) @map("auth_provider")
+  externalId    String?      @map("external_id")
+
+  firstName     String?      @map("first_name")
+  lastName      String?      @map("last_name")
+  age           Int?
+  gender        String?
+  city          String?
+  timezone      String       @default("Europe/Moscow")
+  avatarUrl     String?      @map("avatar_url")
+  locale        String       @default("ru")
+
+  emailVerified Boolean      @default(false) @map("email_verified")
+  phoneVerified Boolean      @default(false) @map("phone_verified")
+  isActive      Boolean      @default(true) @map("is_active")
+  isBanned      Boolean      @default(false) @map("is_banned")
+  totpSecret    String?      @map("totp_secret")
+
+  privacyAcceptedAt  DateTime? @map("privacy_accepted_at")
+  termsAcceptedAt    DateTime? @map("terms_accepted_at")
+
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+  lastLoginAt   DateTime?    @map("last_login_at")
+
+  specialistProfile   SpecialistProfile?
+  valueProfile        ValueProfile?
+  clientBookings      Booking[]           @relation("ClientBookings")
+  clientReviews       Review[]            @relation("ClientReviews")
+  aiConversations     AIConversation[]
+  notifications       Notification[]
+  clientSubscription  ClientSubscription?
+  refreshTokens       RefreshToken[]
+  matchingFeedback    MatchingFeedback[]
+  directMessages      DirectMessage[]     @relation("SenderMessages")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// =========================================
+// SPECIALIST PROFILE
+// =========================================
+
+enum SpecialistType {
+  PSYCHOLOGIST
+  COACH
+  PSYCHOTHERAPIST
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+model SpecialistProfile {
+  id               String             @id @default(cuid())
+  userId           String             @unique @map("user_id")
+  type             SpecialistType
+  verification     VerificationStatus @default(PENDING)
+
+  education        String?
+  experienceYears  Int                @map("experience_years")
+  approaches       String[]
+  specializations  String[]
+  languages        String[]           @default(["ru"])
+  bio              String?
+  aiBio            String?            @map("ai_bio")
+
+  sessionPrice     Int                @map("session_price")
+  sessionDuration  Int                @default(50) @map("session_duration")
+  workFormats      String[]           @map("work_formats")
+  preferredGender  String?            @map("preferred_gender")
+
+  videoProvider    String?            @map("video_provider")
+  videoLink        String?            @map("video_link")
+  videoIntroUrl    String?            @map("video_intro_url")
+  videoIntroStatus String?            @map("video_intro_status")
+
+  averageRating    Float              @default(0) @map("average_rating")
+  totalReviews     Int                @default(0) @map("total_reviews")
+  totalSessions    Int                @default(0) @map("total_sessions")
+
+  subscriptionPlan String             @default("basic") @map("subscription_plan")
+  commissionRate   Float              @default(0.20) @map("commission_rate")
+  maxMonthlyClients Int?              @map("max_monthly_clients")
+
+  verifiedAt       DateTime?          @map("verified_at")
+  verifiedBy       String?            @map("verified_by")
+  rejectionReason  String?            @map("rejection_reason")
+
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  documents        SpecialistDocument[]
+  scheduleSlots    ScheduleSlot[]
+  bookings         Booking[]          @relation("SpecialistBookings")
+  reviews          Review[]           @relation("SpecialistReviews")
+  specialistSubscription SpecialistSubscription?
+  payouts          Payout[]
+
+  @@index([type])
+  @@index([verification])
+  @@index([sessionPrice])
+  @@index([averageRating])
+  @@index([type, verification, sessionPrice])
+  @@map("specialist_profiles")
+}
+
+model SpecialistDocument {
+  id              String   @id @default(cuid())
+  specialistId    String   @map("specialist_id")
+  type            String
+  fileName        String   @map("file_name")
+  fileUrl         String   @map("file_url")
+  fileSize        Int      @map("file_size")
+  mimeType        String   @map("mime_type")
+  status          String   @default("pending")
+  reviewComment   String?  @map("review_comment")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  specialist      SpecialistProfile @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+
+  @@index([specialistId])
+  @@map("specialist_documents")
+}
+
+// =========================================
+// VALUE PROFILES
+// =========================================
+
+enum ValueProfileOwnerType {
+  CLIENT
+  SPECIALIST
+}
+
+model ValueProfile {
+  id          String                @id @default(cuid())
+  userId      String                @unique @map("user_id")
+  ownerType   ValueProfileOwnerType @map("owner_type")
+
+  values      Json
+  communicationStyle Json           @map("communication_style")
+  worldview   Json?
+
+  requestType     String?           @map("request_type")
+  requestSummary  String?           @map("request_summary")
+  preferences     Json?
+
+  professionalValues Json?          @map("professional_values")
+
+  embedding   Unsupported("vector(1536)")?
+
+  summaryText String?               @map("summary_text")
+
+  version     Int                   @default(1)
+  conversationId String?            @map("conversation_id")
+
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime              @updatedAt @map("updated_at")
+
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ownerType])
+  @@map("value_profiles")
+}
+
+// =========================================
+// AI CONVERSATIONS
+// =========================================
+
+enum ConversationType {
+  CLIENT_CONSULTATION
+  SPECIALIST_INTERVIEW
+  PROFILE_CORRECTION
+}
+
+enum ConversationStatus {
+  ACTIVE
+  COMPLETED
+  ABANDONED
+  CRISIS
+}
+
+enum ConversationPhase {
+  GREETING
+  SITUATION_EXPLORATION
+  VALUE_ASSESSMENT
+  FORMAT_PREFERENCES
+  PROFESSIONAL_BACKGROUND
+  WORK_STYLE
+  CASE_QUESTIONS
+  SUMMARY
+  CONFIRMATION
+}
+
+model AIConversation {
+  id           String             @id @default(cuid())
+  userId       String             @map("user_id")
+  type         ConversationType
+  status       ConversationStatus @default(ACTIVE)
+  phase        ConversationPhase  @default(GREETING)
+
+  startedAt    DateTime           @default(now()) @map("started_at")
+  completedAt  DateTime?          @map("completed_at")
+  totalTokens  Int                @default(0) @map("total_tokens")
+  llmModel     String?            @map("llm_model")
+  costUsd      Float              @default(0) @map("cost_usd")
+
+  stateJson    Json?              @map("state_json")
+
+  extractedValues Json?           @map("extracted_values")
+  crisisDetected  Boolean         @default(false) @map("crisis_detected")
+
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages     AIMessage[]
+
+  @@index([userId])
+  @@index([type, status])
+  @@index([createdAt])
+  @@map("ai_conversations")
+}
+
+model AIMessage {
+  id              String         @id @default(cuid())
+  conversationId  String         @map("conversation_id")
+  role            String
+  content         String
+  contentEncrypted Boolean       @default(false) @map("content_encrypted")
+
+  phase           ConversationPhase?
+  tokensUsed      Int            @default(0) @map("tokens_used")
+  metadata        Json?
+
+  createdAt       DateTime       @default(now()) @map("created_at")
+
+  conversation    AIConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("ai_messages")
+}
+
+// =========================================
+// SCHEDULE
+// =========================================
+
+model ScheduleSlot {
+  id            String            @id @default(cuid())
+  specialistId  String            @map("specialist_id")
+
+  isRecurring   Boolean           @default(true) @map("is_recurring")
+  dayOfWeek     Int?              @map("day_of_week")
+  startTime     String?           @map("start_time")
+  endTime       String?           @map("end_time")
+
+  slotDate      DateTime?         @map("slot_date") @db.Date
+  slotStart     DateTime?         @map("slot_start")
+  slotEnd       DateTime?         @map("slot_end")
+
+  isAvailable   Boolean           @default(true) @map("is_available")
+
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  specialist    SpecialistProfile @relation(fields: [specialistId], references: [id], onDelete: Cascade)
+
+  @@index([specialistId, slotDate])
+  @@index([specialistId, dayOfWeek])
+  @@index([specialistId, isAvailable, slotDate])
+  @@map("schedule_slots")
+}
+
+// =========================================
+// BOOKINGS
+// =========================================
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED_CLIENT
+  CANCELLED_SPEC
+  NO_SHOW
+  RESCHEDULED
+}
+
+model Booking {
+  id             String        @id @default(cuid())
+  clientId       String        @map("client_id")
+  specialistId   String        @map("specialist_id")
+
+  slotStart      DateTime      @map("slot_start")
+  slotEnd        DateTime      @map("slot_end")
+  duration       Int
+  timezone       String
+
+  status         BookingStatus @default(PENDING_PAYMENT)
+  format         String
+
+  videoLink      String?       @map("video_link")
+  videoProvider  String?       @map("video_provider")
+
+  packageId      String?       @map("package_id")
+
+  price          Int
+  commission     Int
+  specialistPayout Int         @map("specialist_payout")
+
+  cancelledAt    DateTime?     @map("cancelled_at")
+  cancelReason   String?       @map("cancel_reason")
+  refundAmount   Int?          @map("refund_amount")
+
+  matchScore     Float?        @map("match_score")
+  matchSource    String?       @map("match_source")
+
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  client         User          @relation("ClientBookings", fields: [clientId], references: [id])
+  specialist     SpecialistProfile @relation("SpecialistBookings", fields: [specialistId], references: [id])
+  payment        Payment?
+  review         Review?
+  sessionPackage SessionPackage? @relation(fields: [packageId], references: [id])
+  reminders      BookingReminder[]
+
+  @@index([clientId, status])
+  @@index([specialistId, status])
+  @@index([slotStart])
+  @@index([status, slotStart])
+  @@map("bookings")
+}
+
+model BookingReminder {
+  id          String   @id @default(cuid())
+  bookingId   String   @map("booking_id")
+  type        String
+  channel     String
+  sentAt      DateTime? @map("sent_at")
+  scheduledAt DateTime @map("scheduled_at")
+
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([scheduledAt, sentAt])
+  @@map("booking_reminders")
+}
+
+// =========================================
+// PAYMENTS
+// =========================================
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  CANCELLED
+  REFUNDED
+  PARTIAL_REFUND
+  FAILED
+}
+
+model Payment {
+  id              String        @id @default(cuid())
+  bookingId       String?       @unique @map("booking_id")
+  userId          String        @map("user_id")
+
+  amount          Int
+  currency        String        @default("RUB")
+  refundedAmount  Int           @default(0) @map("refunded_amount")
+
+  status          PaymentStatus @default(PENDING)
+  type            String
+
+  externalId      String?       @unique @map("external_id")
+  idempotencyKey  String        @unique @map("idempotency_key")
+  paymentMethod   String?       @map("payment_method")
+  confirmationUrl String?       @map("confirmation_url")
+
+  receiptSent     Boolean       @default(false) @map("receipt_sent")
+  receiptUrl      String?       @map("receipt_url")
+
+  metadata        Json?
+  errorCode       String?       @map("error_code")
+  errorMessage    String?       @map("error_message")
+
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  paidAt          DateTime?     @map("paid_at")
+
+  booking         Booking?      @relation(fields: [bookingId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@index([externalId])
+  @@index([createdAt])
+  @@map("payments")
+}
+
+model Payout {
+  id              String            @id @default(cuid())
+  specialistId    String            @map("specialist_id")
+
+  amount          Int
+  currency        String            @default("RUB")
+  status          String            @default("pending")
+  externalId      String?           @map("external_id")
+
+  periodStart     DateTime          @map("period_start")
+  periodEnd       DateTime          @map("period_end")
+  sessionsCount   Int               @map("sessions_count")
+  totalGross      Int               @map("total_gross")
+  totalCommission Int               @map("total_commission")
+  payoutDetails   Json?             @map("payout_details")
+
+  payoutMethod    String            @map("payout_method")
+  payoutTarget    String            @map("payout_target")
+
+  createdAt       DateTime          @default(now()) @map("created_at")
+  processedAt     DateTime?         @map("processed_at")
+
+  specialist      SpecialistProfile @relation(fields: [specialistId], references: [id])
+
+  @@index([specialistId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("payouts")
+}
+
+// =========================================
+// SUBSCRIPTIONS
+// =========================================
+
+model SpecialistSubscription {
+  id             String            @id @default(cuid())
+  specialistId   String            @unique @map("specialist_id")
+  plan           String
+  status         String            @default("active")
+  priceMonthly   Int               @map("price_monthly")
+
+  externalSubscriptionId String?   @unique @map("external_subscription_id")
+  paymentMethodId        String?   @map("payment_method_id")
+
+  currentPeriodStart DateTime      @map("current_period_start")
+  currentPeriodEnd   DateTime      @map("current_period_end")
+  cancelledAt        DateTime?     @map("cancelled_at")
+  cancelAtPeriodEnd  Boolean       @default(false) @map("cancel_at_period_end")
+
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  specialist         SpecialistProfile @relation(fields: [specialistId], references: [id])
+
+  @@map("specialist_subscriptions")
+}
+
+model ClientSubscription {
+  id             String   @id @default(cuid())
+  userId         String   @unique @map("user_id")
+  plan           String
+  status         String   @default("active")
+  priceMonthly   Int      @map("price_monthly")
+
+  externalSubscriptionId String? @unique @map("external_subscription_id")
+  paymentMethodId        String? @map("payment_method_id")
+
+  currentPeriodStart DateTime @map("current_period_start")
+  currentPeriodEnd   DateTime @map("current_period_end")
+  cancelledAt        DateTime? @map("cancelled_at")
+  cancelAtPeriodEnd  Boolean  @default(false) @map("cancel_at_period_end")
+
+  aiConsultationsUsed  Int    @default(0) @map("ai_consultations_used")
+  aiConsultationsLimit Int    @default(1) @map("ai_consultations_limit")
+
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id])
+
+  @@map("client_subscriptions")
+}
+
+// =========================================
+// SESSION PACKAGES
+// =========================================
+
+model SessionPackage {
+  id             String   @id @default(cuid())
+  clientId       String   @map("client_id")
+  specialistId   String   @map("specialist_id")
+
+  totalSessions  Int      @map("total_sessions")
+  usedSessions   Int      @default(0) @map("used_sessions")
+  discountPercent Float   @map("discount_percent")
+  pricePerSession Int     @map("price_per_session")
+  totalPrice     Int      @map("total_price")
+
+  status         String   @default("active")
+  expiresAt      DateTime @map("expires_at")
+
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  bookings       Booking[]
+
+  @@index([clientId])
+  @@index([specialistId])
+  @@map("session_packages")
+}
+
+// =========================================
+// REVIEWS
+// =========================================
+
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  REJECTED
+  EDIT_REQUESTED
+}
+
+model Review {
+  id              String       @id @default(cuid())
+  bookingId       String       @unique @map("booking_id")
+  clientId        String       @map("client_id")
+  specialistId    String       @map("specialist_id")
+
+  rating          Int
+  comment         String?
+
+  matchRating     Int?         @map("match_rating")
+  matchFeedback   String?      @map("match_feedback")
+
+  status          ReviewStatus @default(PENDING)
+  moderatedBy     String?      @map("moderated_by")
+  moderatedAt     DateTime?    @map("moderated_at")
+  moderationNote  String?      @map("moderation_note")
+
+  isAnonymous     Boolean      @default(true) @map("is_anonymous")
+  sessionNumber   Int          @default(1) @map("session_number")
+
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  booking         Booking      @relation(fields: [bookingId], references: [id])
+  client          User         @relation("ClientReviews", fields: [clientId], references: [id])
+  specialist      SpecialistProfile @relation("SpecialistReviews", fields: [specialistId], references: [id])
+
+  @@index([specialistId, status])
+  @@index([clientId])
+  @@index([status])
+  @@map("reviews")
+}
+
+// =========================================
+// MATCHING
+// =========================================
+
+model MatchingResult {
+  id             String   @id @default(cuid())
+  clientId       String   @map("client_id")
+  conversationId String?  @map("conversation_id")
+
+  results        Json
+  totalCandidates Int     @map("total_candidates")
+  generatedAt    DateTime @map("generated_at")
+  generationTimeMs Int    @map("generation_time_ms")
+
+  algorithmVersion String @map("algorithm_version")
+
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([clientId, createdAt])
+  @@map("matching_results")
+}
+
+model MatchingFeedback {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  matchingResultId String  @map("matching_result_id")
+  specialistId    String   @map("specialist_id")
+
+  action          String
+  rejectReason    String?  @map("reject_reason")
+  comment         String?
+
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user            User     @relation(fields: [userId], references: [id])
+
+  @@index([matchingResultId])
+  @@index([specialistId])
+  @@map("matching_feedback")
+}
+
+// =========================================
+// DIRECT MESSAGING (Phase 2)
+// =========================================
+
+model DirectMessageThread {
+  id             String   @id @default(cuid())
+  clientId       String   @map("client_id")
+  specialistId   String   @map("specialist_id")
+  bookingId      String?  @map("booking_id")
+
+  lastMessageAt  DateTime? @map("last_message_at")
+  isActive       Boolean  @default(true) @map("is_active")
+
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  messages       DirectMessage[]
+
+  @@unique([clientId, specialistId])
+  @@index([clientId])
+  @@index([specialistId])
+  @@map("direct_message_threads")
+}
+
+model DirectMessage {
+  id        String   @id @default(cuid())
+  threadId  String   @map("thread_id")
+  senderId  String   @map("sender_id")
+  content   String
+  fileUrl   String?  @map("file_url")
+  fileName  String?  @map("file_name")
+  readAt    DateTime? @map("read_at")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  thread    DirectMessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender    User                @relation("SenderMessages", fields: [senderId], references: [id])
+
+  @@index([threadId, createdAt])
+  @@map("direct_messages")
+}
+
+// =========================================
+// NOTIFICATIONS
+// =========================================
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  type      String
+  title     String
+  body      String
+  channel   String
+  status    String   @default("pending")
+  readAt    DateTime? @map("read_at")
+  sentAt    DateTime? @map("sent_at")
+
+  entityType String? @map("entity_type")
+  entityId   String? @map("entity_id")
+
+  metadata   Json?
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([status, channel])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// =========================================
+// PROMO CODES
+// =========================================
+
+model PromoCode {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  type          String
+  value         Float
+  maxUses       Int?     @map("max_uses")
+  usedCount     Int      @default(0) @map("used_count")
+  validFrom     DateTime @map("valid_from")
+  validUntil    DateTime @map("valid_until")
+  applicableTo  String   @map("applicable_to")
+  isActive      Boolean  @default(true) @map("is_active")
+
+  createdAt     DateTime @default(now()) @map("created_at")
+  createdBy     String   @map("created_by")
+
+  @@index([code])
+  @@index([validUntil, isActive])
+  @@map("promo_codes")
+}
+
+// =========================================
+// CRISIS ALERTS
+// =========================================
+
+model CrisisAlert {
+  id              String   @id @default(cuid())
+  conversationId  String   @map("conversation_id")
+  userId          String   @map("user_id")
+  severity        String
+  markers         String[]
+  messageExcerpt  String?  @map("message_excerpt")
+
+  status          String   @default("new")
+  assignedTo      String?  @map("assigned_to")
+  resolution      String?
+  resolvedAt      DateTime? @map("resolved_at")
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("crisis_alerts")
+}
+
+// =========================================
+// ANALYTICS
+// =========================================
+
+model AnalyticsEvent {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  event     String
+  properties Json?
+  sessionId  String? @map("session_id")
+  userAgent  String? @map("user_agent")
+  ipAddress  String? @map("ip_address")
+
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([event, createdAt])
+  @@index([userId, createdAt])
+  @@map("analytics_events")
+}

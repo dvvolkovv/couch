@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-950 font-sans;
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2;
+  }
+
+  h1 {
+    @apply text-heading-1;
+  }
+  h2 {
+    @apply text-heading-2;
+  }
+  h3 {
+    @apply text-heading-3;
+  }
+  h4 {
+    @apply text-heading-4;
+  }
+  h5 {
+    @apply text-heading-5;
+  }
+  h6 {
+    @apply text-heading-6;
+  }
+}
+
+@layer utilities {
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-primary;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Mobile responsive typography */
+@media (max-width: 767px) {
+  .text-display-xl {
+    font-size: 36px;
+  }
+  .text-display-lg {
+    font-size: 32px;
+  }
+  .text-display-md {
+    font-size: 28px;
+  }
+  .text-heading-1 {
+    font-size: 28px;
+  }
+  .text-heading-2 {
+    font-size: 24px;
+  }
+  .text-heading-3 {
+    font-size: 20px;
+  }
+  .text-heading-4 {
+    font-size: 18px;
+  }
+}
