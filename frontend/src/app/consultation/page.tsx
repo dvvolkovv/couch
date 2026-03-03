@@ -10,6 +10,7 @@ import { QuickReplies } from "@/components/chat/quick-replies";
 import { ConsultationSummary } from "@/components/chat/consultation-summary";
 import { ChatProgress } from "@/components/chat/chat-progress";
 import { CrisisAlert } from "@/components/chat/crisis-alert";
+import { Progress } from "@/components/ui/progress";
 import { useConsultationStore } from "@/store/consultation-store";
 import { useAuthStore } from "@/store/auth-store";
 import { apiClient } from "@/lib/api-client";
