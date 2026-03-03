@@ -276,7 +276,7 @@ export class AiChatService {
     });
 
     // Get conversation state
-    const state = (conversation.stateJson as ConversationState) || {
+    const state = (conversation.stateJson as unknown as ConversationState) || {
       exchangeCount: 0,
       phaseExchangeCount: 0,
       extractedData: {},
@@ -293,7 +293,7 @@ export class AiChatService {
 
     let currentPhase = conversation.phase;
     if (shouldTransition && nextPhase) {
-      currentPhase = nextPhase;
+      currentPhase = nextPhase as unknown as typeof conversation.phase;
       state.phaseExchangeCount = 0;
     }
 

@@ -9,10 +9,6 @@ import { SpecialistsModule } from './modules/specialists/specialists.module';
 import { AiModule } from './modules/ai/ai.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { BookingModule } from './modules/booking/booking.module';
-import { PaymentsModule } from './modules/payments/payments.module';
-import { ReviewsModule } from './modules/reviews/reviews.module';
-import { NotificationsModule } from './modules/notifications/notifications.module';
-import { AdminModule } from './modules/admin/admin.module';
 import { ValueProfileModule } from './modules/value-profile/value-profile.module';
 
 @Module({
@@ -35,10 +31,6 @@ import { ValueProfileModule } from './modules/value-profile/value-profile.module
     AiModule,
     MatchingModule,
     BookingModule,
-    PaymentsModule,
-    ReviewsModule,
-    NotificationsModule,
-    AdminModule,
     ValueProfileModule,
   ],
 })

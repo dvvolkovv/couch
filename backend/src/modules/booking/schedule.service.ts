@@ -39,9 +39,7 @@ export class ScheduleService {
       }));
 
     return {
-      timezone: specialist.user
-        ? 'Europe/Moscow'
-        : 'Europe/Moscow',
+      timezone: 'Europe/Moscow',
       recurringSlots,
       customSlots,
       blockedDates: [],
