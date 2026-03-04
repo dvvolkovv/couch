@@ -1,0 +1,85 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Личные данные — SoulMate",
+};
+
+export default function ProfilePersonalPage() {
+  return (
+    <div className="mx-auto max-w-container px-4 py-8 md:px-8">
+      <div className="mb-8">
+        <Link
+          href="/profile"
+          className="inline-flex items-center gap-2 text-body-sm text-neutral-600 hover:text-primary-700 transition-colors"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {"Назад к настройкам"}
+        </Link>
+      </div>
+
+      <h1 className="text-heading-2 text-neutral-900 mb-8">{"Личные данные"}</h1>
+
+      <div className="max-w-lg space-y-6">
+        {/* Avatar */}
+        <div className="flex items-center gap-6 rounded-xl border border-neutral-300 bg-white p-6 shadow-card">
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary-100 shrink-0">
+            <User className="h-10 w-10 text-primary-400" />
+          </div>
+          <div>
+            <p className="text-body-md font-medium text-neutral-900 mb-2">{"Фото профиля"}</p>
+            <Button variant="secondary" size="sm">{"Загрузить фото"}</Button>
+          </div>
+        </div>
+
+        {/* Form fields */}
+        <div className="rounded-xl border border-neutral-300 bg-white p-6 shadow-card space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-body-sm font-medium text-neutral-700 mb-1">
+                {"Имя"}
+              </label>
+              <div className="h-10 rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 text-body-sm text-neutral-400">
+                {"Имя"}
+              </div>
+            </div>
+            <div>
+              <label className="block text-body-sm font-medium text-neutral-700 mb-1">
+                {"Фамилия"}
+              </label>
+              <div className="h-10 rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 text-body-sm text-neutral-400">
+                {"Фамилия"}
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-body-sm font-medium text-neutral-700 mb-1">
+              {"Email"}
+            </label>
+            <div className="h-10 rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 text-body-sm text-neutral-400">
+              {"email@example.com"}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-body-sm font-medium text-neutral-700 mb-1">
+              {"Телефон"}
+            </label>
+            <div className="h-10 rounded-md border border-neutral-300 bg-neutral-50 px-3 py-2 text-body-sm text-neutral-400">
+              {"+7 (999) 000-00-00"}
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-neutral-100 p-4 text-body-sm text-neutral-600">
+            {"Редактирование профиля находится в разработке"}
+          </div>
+
+          <Button className="w-full" disabled>{"Сохранить изменения"}</Button>
+        </div>
+      </div>
+    </div>
+  );
+}

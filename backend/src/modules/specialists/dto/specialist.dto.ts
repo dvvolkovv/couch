@@ -9,6 +9,8 @@ import {
   ArrayMinSize,
 } from 'class-validator';
 
+const SPECIALIST_TYPES = ['PSYCHOLOGIST', 'COACH', 'PSYCHOTHERAPIST'] as const;
+
 export class ApplySpecialistDto {
   @IsEnum(['PSYCHOLOGIST', 'COACH', 'PSYCHOTHERAPIST'])
   type: string;
@@ -82,7 +84,7 @@ export class UpdateSpecialistDto {
 }
 
 export class CatalogQueryDto {
-  @IsString()
+  @IsEnum(SPECIALIST_TYPES)
   @IsOptional()
   type?: string;
 

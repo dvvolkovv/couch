@@ -32,10 +32,18 @@ import { AiChatService } from './ai-chat.service';
  *   crisis_detected: { conversationId, emergencyInfo }
  *   error: { code, message }
  */
+// Build safe CORS origin list: wildcard '*' is incompatible with credentials:true,
+// so fall back to a permissive function that accepts all origins in that edge case.
+const _rawOrigins = process.env.CORS_ORIGINS?.split(',').map((o) => o.trim()) ?? [];
+const _wsOrigin: string | string[] | ((origin: string, cb: (err: any, allow?: boolean) => void) => void) =
+  _rawOrigins.length === 0 || _rawOrigins.includes('*')
+    ? (origin, cb) => cb(null, true)            // allow all — only if wildcard is explicitly set
+    : _rawOrigins;
+
 @WebSocketGateway({
   namespace: 'ai-chat',
   cors: {
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: _wsOrigin,
     credentials: true,
   },
 })

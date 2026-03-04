@@ -1,0 +1,69 @@
+import type { Metadata } from "next";
+import { Users, Calendar, Star, DollarSign } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Дашборд специалиста — SoulMate",
+};
+
+const stats = [
+  {
+    icon: Users,
+    label: "Клиентов",
+    value: "0",
+    colorClass: "bg-primary-100",
+    iconColor: "text-primary-600",
+  },
+  {
+    icon: Calendar,
+    label: "Сессий",
+    value: "0",
+    colorClass: "bg-success-100",
+    iconColor: "text-success-600",
+  },
+  {
+    icon: Star,
+    label: "Рейтинг",
+    value: "—",
+    colorClass: "bg-secondary-100",
+    iconColor: "text-secondary-600",
+  },
+  {
+    icon: DollarSign,
+    label: "Доход",
+    value: "0 руб",
+    colorClass: "bg-warning-100",
+    iconColor: "text-warning-600",
+  },
+];
+
+export default function SpecialistDashboardPage() {
+  return (
+    <div className="mx-auto max-w-container px-4 py-8 md:px-8">
+      <h1 className="text-heading-2 text-neutral-900 mb-8">{"Дашборд"}</h1>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        {stats.map(({ icon: Icon, label, value, colorClass, iconColor }) => (
+          <div
+            key={label}
+            className="rounded-xl border border-neutral-300 bg-white p-6 shadow-card"
+          >
+            <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl ${colorClass}`}>
+              <Icon className={`h-5 w-5 ${iconColor}`} />
+            </div>
+            <p className="text-heading-3 text-neutral-900 font-bold">{value}</p>
+            <p className="text-body-sm text-neutral-600">{label}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-8 text-center">
+        <p className="text-body-lg text-neutral-700 mb-2">
+          {"Ваш профиль ещё не активирован"}
+        </p>
+        <p className="text-body-sm text-neutral-600">
+          {"После верификации документов здесь появится статистика и записи клиентов"}
+        </p>
+      </div>
+    </div>
+  );
+}
