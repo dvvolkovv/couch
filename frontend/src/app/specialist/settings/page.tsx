@@ -39,7 +39,7 @@ function Toggle({ checked, onChange, label, description }: {
 }
 
 export default function SpecialistSettingsPage() {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, isLoading } = useAuthStore();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -64,6 +64,14 @@ export default function SpecialistSettingsPage() {
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-600 border-t-transparent" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return (
