@@ -38,11 +38,14 @@ export default function CatalogPage() {
       if (searchQuery) params.search = searchQuery;
       if (sortBy) params.sortBy = sortBy;
 
-      const { data } = await apiClient.get("/catalog/specialists", { params });
+      const response = await apiClient.get("/catalog/specialists", { params });
+      console.log("Catalog API response:", JSON.stringify(response.data).slice(0, 200));
+      const data = response.data;
       const items = data.data || data;
       setSpecialists(Array.isArray(items) ? items : []);
       setTotal(data.pagination?.total ?? (Array.isArray(items) ? items.length : 0));
-    } catch {
+    } catch (err) {
+      console.error("Catalog fetch error:", err);
       setSpecialists([]);
       setTotal(0);
     } finally {
