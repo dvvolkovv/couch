@@ -37,7 +37,8 @@ export function ConsultationSummary({
   onEdit,
   loading,
 }: ConsultationSummaryProps) {
-  const values = summary?.valueProfile?.values ?? summary?.values ?? {};
+  const raw = summary as any;
+  const values = summary?.valueProfile?.values ?? raw?.values ?? {};
   const preferences = summary?.preferences ?? {};
   const priceRange = preferences?.priceRange ?? [0, 0];
   const specialistType = summary?.recommendedSpecialistType ?? "PSYCHOLOGIST";
