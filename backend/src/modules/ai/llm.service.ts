@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
 
 export interface LlmMessage {
   role: 'user' | 'assistant';
@@ -24,23 +24,28 @@ export interface LlmResponse {
 
 /**
  * LLM service abstraction layer.
- * Primary: Claude (Anthropic)
- * Fallback: Could be extended with OpenAI GPT-4o-mini.
+ * Primary: DeepSeek (OpenAI-compatible API)
  */
 @Injectable()
 export class LlmService {
   private readonly logger = new Logger(LlmService.name);
-  private anthropic: Anthropic;
+  private openai: OpenAI | null = null;
   private readonly model: string;
 
   constructor(private readonly configService: ConfigService) {
-    const apiKey = this.configService.get<string>('ANTHROPIC_API_KEY');
-    if (apiKey && apiKey !== 'sk-ant-your-key-here') {
-      this.anthropic = new Anthropic({ apiKey });
+    const apiKey = this.configService.get<string>('DEEPSEEK_API_KEY');
+    if (apiKey) {
+      this.openai = new OpenAI({
+        apiKey,
+        baseURL: 'https://api.deepseek.com',
+      });
+      this.logger.log('DeepSeek LLM initialized');
+    } else {
+      this.logger.warn('DEEPSEEK_API_KEY not set, using mock fallback');
     }
     this.model = this.configService.get<string>(
-      'ANTHROPIC_MODEL',
-      'claude-sonnet-4-20250514',
+      'DEEPSEEK_MODEL',
+      'deepseek-chat',
     );
   }
 
@@ -49,15 +54,15 @@ export class LlmService {
    * Tokens are delivered via the onToken callback for real-time streaming.
    */
   async streamChat(params: LlmStreamParams): Promise<LlmResponse> {
-    if (!this.anthropic) {
+    if (!this.openai) {
       return this.mockStreamChat(params);
     }
 
     try {
-      return await this.anthropicStream(params);
+      return await this.deepseekStream(params);
     } catch (error: any) {
       this.logger.warn(
-        `Primary LLM (Anthropic) failed: ${error.message}. Using mock fallback.`,
+        `DeepSeek LLM failed: ${error.message}. Using mock fallback.`,
       );
       return this.mockStreamChat(params);
     }
@@ -72,27 +77,29 @@ export class LlmService {
     temperature?: number;
     maxTokens?: number;
   }): Promise<{ content: string; inputTokens: number; outputTokens: number }> {
-    if (!this.anthropic) {
+    if (!this.openai) {
       return this.mockStructuredOutput(params);
     }
 
     try {
-      const response = await this.anthropic.messages.create({
+      const response = await this.openai.chat.completions.create({
         model: this.model,
         max_tokens: params.maxTokens || 4096,
         temperature: params.temperature || 0.3,
-        system: params.systemPrompt,
-        messages: params.messages.map((m) => ({
-          role: m.role,
-          content: m.content,
-        })),
+        messages: [
+          { role: 'system', content: params.systemPrompt },
+          ...params.messages.map((m) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
+        ],
       });
 
-      const textBlock = response.content.find((c) => c.type === 'text');
+      const content = response.choices[0]?.message?.content || '';
       return {
-        content: textBlock ? textBlock.text : '',
-        inputTokens: response.usage.input_tokens,
-        outputTokens: response.usage.output_tokens,
+        content,
+        inputTokens: response.usage?.prompt_tokens || 0,
+        outputTokens: response.usage?.completion_tokens || 0,
       };
     } catch (error: any) {
       this.logger.warn(`Structured output failed: ${error.message}`);
@@ -100,36 +107,37 @@ export class LlmService {
     }
   }
 
-  private async anthropicStream(params: LlmStreamParams): Promise<LlmResponse> {
+  private async deepseekStream(params: LlmStreamParams): Promise<LlmResponse> {
     let fullContent = '';
     let inputTokens = 0;
     let outputTokens = 0;
 
-    const stream = this.anthropic.messages.stream({
+    const stream = await this.openai!.chat.completions.create({
       model: this.model,
       max_tokens: params.maxTokens || 1024,
       temperature: params.temperature || 0.7,
-      system: params.systemPrompt,
-      messages: params.messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
+      stream: true,
+      stream_options: { include_usage: true },
+      messages: [
+        { role: 'system', content: params.systemPrompt },
+        ...params.messages.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        })),
+      ],
     });
 
-    for await (const event of stream) {
-      if (
-        event.type === 'content_block_delta' &&
-        event.delta.type === 'text_delta'
-      ) {
-        const token = event.delta.text;
-        fullContent += token;
-        params.onToken(token);
+    for await (const chunk of stream) {
+      const delta = chunk.choices[0]?.delta?.content;
+      if (delta) {
+        fullContent += delta;
+        params.onToken(delta);
+      }
+      if (chunk.usage) {
+        inputTokens = chunk.usage.prompt_tokens || 0;
+        outputTokens = chunk.usage.completion_tokens || 0;
       }
     }
-
-    const finalMessage = await stream.finalMessage();
-    inputTokens = finalMessage.usage.input_tokens;
-    outputTokens = finalMessage.usage.output_tokens;
 
     return {
       content: fullContent,
@@ -141,31 +149,29 @@ export class LlmService {
 
   /**
    * Mock implementation for development without API keys.
-   * Generates contextually appropriate responses based on phase.
    */
   private async mockStreamChat(params: LlmStreamParams): Promise<LlmResponse> {
-    const lastMessage = params.messages[params.messages.length - 1];
     const isFirstMessage = params.messages.length <= 1;
     let response: string;
 
     if (isFirstMessage || params.systemPrompt.includes('GREETING')) {
       response =
-        'Zdravstvuyte! I am the SoulMate AI consultant. I will help you understand your needs and find a suitable specialist. Our conversation is confidential. Is this your first experience with a psychologist or coach?';
+        'Здравствуйте! Я AI-консультант платформы SoulMate. Я помогу вам разобраться в ваших потребностях и подобрать подходящего специалиста. Наш разговор конфиденциален. Скажите, у вас есть опыт работы с психологом или коучем?';
     } else if (params.systemPrompt.includes('SITUATION_EXPLORATION')) {
       response =
-        'Thank you for sharing. I understand this is important to you. Could you tell me more about how long you have been experiencing this, and how it affects your daily life?';
+        'Спасибо, что поделились. Я понимаю, что это важно для вас. Расскажите подробнее, как давно вы замечаете эту ситуацию и как она влияет на вашу повседневную жизнь?';
     } else if (params.systemPrompt.includes('VALUE_ASSESSMENT')) {
       response =
-        'That is very insightful. Let me ask you a reflective question: imagine you have a year of complete freedom, no financial constraints or obligations. How would you spend that year?';
+        'Это очень ценное наблюдение. Позвольте задать вам проективный вопрос: представьте, что у вас есть год полной свободы — никаких финансовых ограничений или обязательств. Как бы вы провели этот год?';
     } else if (params.systemPrompt.includes('FORMAT_PREFERENCES')) {
       response =
-        'Thank you for all your answers. Now let us discuss practical preferences. Would you prefer to work online via video call, or in person? And what budget per session would be comfortable for you?';
+        'Спасибо за все ваши ответы. Давайте обсудим практические предпочтения. Вам удобнее работать онлайн по видеосвязи или очно? И какой бюджет за сессию был бы для вас комфортным?';
     } else if (params.systemPrompt.includes('SUMMARY')) {
       response =
-        '**Summary of our conversation:**\n\n**Your request:** Personal growth and managing work-life balance\n\n**Recommended specialist:** Psychologist\n\n**Your key values:**\n- Development: high priority\n- Freedom: very important\n- Health: significant focus\n\n**Style preferences:** Supportive, analytical approach\n\n**Format:** Online\n**Budget:** 2000-4000 RUB\n\nIs this accurate?';
+        '**Итог нашей беседы:**\n\n**Ваш запрос:** Личностный рост и управление балансом работы и жизни\n\n**Рекомендуемый специалист:** Психолог\n\n**Ваши ключевые ценности:**\n- Развитие: высокий приоритет\n- Свобода: очень важна\n- Здоровье: значительный фокус\n\n**Предпочтения по стилю:** Поддерживающий, аналитический подход\n\n**Формат:** Онлайн\n**Бюджет:** 2000-4000 руб.\n\nВсё верно?';
     } else {
       response =
-        'I understand. Thank you for sharing that with me. Let me consider this carefully. Could you elaborate a bit more on what feels most important to you in this situation?';
+        'Я понимаю. Спасибо, что поделились этим. Позвольте мне обдумать это. Не могли бы вы рассказать подробнее, что для вас сейчас кажется наиболее важным в этой ситуации?';
     }
 
     // Simulate streaming
@@ -210,7 +216,7 @@ export class LlmService {
             depth_vs_speed: 0.7,
             evidence_vs_intuition: 0.4,
           },
-          summary_text: 'Experienced specialist focused on deep, evidence-based work with an analytical approach.',
+          summary_text: 'Опытный специалист, ориентированный на глубокую, доказательную работу с аналитическим подходом.',
           confidence: 0.75,
         }
       : {
@@ -230,8 +236,8 @@ export class LlmService {
             individual_vs_collective: 0.4,
           },
           request_type: 'therapy',
-          request_summary: 'Professional burnout, loss of motivation, difficulty with boundaries at work.',
-          summary_text: 'Values freedom and development. Prefers supportive, analytical approach.',
+          request_summary: 'Профессиональное выгорание, потеря мотивации, сложности с границами на работе.',
+          summary_text: 'Ценит свободу и развитие. Предпочитает поддерживающий, аналитический подход.',
           confidence: 0.8,
         };
 
