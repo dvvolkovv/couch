@@ -25,19 +25,19 @@ export default function LandingPage() {
                 id="hero-heading"
                 className="text-display-lg md:text-display-xl text-primary-900"
               >
-                {"\u041D\u0430\u0439\u0434\u0438\u0442\u0435 \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u0430, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 "}
+                {"Найдите специалиста, который "}
                 <span className="gradient-text">
-                  {"\u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u043E"}
+                  {"действительно"}
                 </span>
-                {" \u0432\u0430\u043C \u043F\u043E\u0434\u0445\u043E\u0434\u0438\u0442"}
+                {" вам подходит"}
               </h1>
               <p className="mt-6 text-body-lg text-neutral-700 max-w-lg">
-                {"\u0418\u0418-\u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u043D\u0442 \u043F\u043E\u043C\u043E\u0436\u0435\u0442 \u0440\u0430\u0437\u043E\u0431\u0440\u0430\u0442\u044C\u0441\u044F \u0432 \u0432\u0430\u0448\u0435\u043C \u0437\u0430\u043F\u0440\u043E\u0441\u0435 \u0438 \u043F\u043E\u0434\u0431\u0435\u0440\u0451\u0442 \u043F\u0441\u0438\u0445\u043E\u043B\u043E\u0433\u0430 \u0438\u043B\u0438 \u043A\u043E\u0443\u0447\u0430 \u043F\u043E \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u044E \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u0435\u0439, \u0430 \u043D\u0435 \u0442\u043E\u043B\u044C\u043A\u043E \u043F\u043E \u0446\u0435\u043D\u0435."}
+                {"ИИ-консультант поможет разобраться в вашем запросе и подберёт психолога или коуча по совпадению ценностей, а не только по цене."}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Button size="lg" className="text-btn-lg" asChild>
                   <Link href="/consultation">
-                    {"\u041D\u0430\u0447\u0430\u0442\u044C \u0431\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u044B\u0439 \u043F\u043E\u0434\u0431\u043E\u0440"}
+                    {"Начать бесплатный подбор"}
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
@@ -45,15 +45,15 @@ export default function LandingPage() {
               <div className="mt-6 flex items-center gap-6 text-body-sm text-neutral-600">
                 <span className="flex items-center gap-1.5">
                   <Shield className="h-4 w-4 text-primary-500" />
-                  {"\u0411\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u043E"}
+                  {"Бесплатно"}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="h-4 w-4 text-primary-500" />
-                  15 {"\u043C\u0438\u043D\u0443\u0442"}
+                  15 {"минут"}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <Lock className="h-4 w-4 text-primary-500" />
-                  {"\u041A\u043E\u043D\u0444\u0438\u0434\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u043E"}
+                  {"Конфиденциально"}
                 </span>
               </div>
             </div>
@@ -75,7 +75,7 @@ export default function LandingPage() {
                       </div>
                     </div>
                     <p className="mt-4 text-body-sm font-semibold text-primary-800">
-                      92% {"\u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435"}
+                      92% {"совпадение"}
                     </p>
                   </div>
                 </div>
@@ -95,7 +95,7 @@ export default function LandingPage() {
             id="how-it-works-heading"
             className="text-center text-heading-2 text-neutral-900"
           >
-            {"\u041A\u0430\u043A \u044D\u0442\u043E \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442"}
+            {"Как это работает"}
           </h2>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
@@ -103,23 +103,23 @@ export default function LandingPage() {
               {
                 step: 1,
                 icon: MessageCircle,
-                title: "\u0420\u0430\u0441\u0441\u043A\u0430\u0436\u0438\u0442\u0435 \u0418\u0418 \u043E \u0441\u0435\u0431\u0435",
+                title: "Расскажите ИИ о себе",
                 description:
-                  "\u0418\u0418-\u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u043D\u0442 \u043F\u0440\u043E\u0432\u0435\u0434\u0451\u0442 15-\u043C\u0438\u043D\u0443\u0442\u043D\u0443\u044E \u0431\u0435\u0441\u0435\u0434\u0443 \u043E \u0432\u0430\u0448\u0435\u043C \u0437\u0430\u043F\u0440\u043E\u0441\u0435 \u0438 \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u044F\u0445.",
+                  "ИИ-консультант проведёт 15-минутную беседу о вашем запросе и ценностях.",
               },
               {
                 step: 2,
                 icon: Users,
-                title: "\u041F\u043E\u043B\u0443\u0447\u0438\u0442\u0435 \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0446\u0438\u0438",
+                title: "Получите рекомендации",
                 description:
-                  "\u041C\u044B \u043F\u043E\u0434\u0431\u0435\u0440\u0451\u043C Top-5 \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u043E\u0432 \u0441 \u043D\u0430\u0438\u0431\u043E\u043B\u044C\u0448\u0438\u043C \u043F\u0440\u043E\u0446\u0435\u043D\u0442\u043E\u043C \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u044F \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u0435\u0439.",
+                  "Мы подберём Top-5 специалистов с наибольшим процентом совпадения ценностей.",
               },
               {
                 step: 3,
                 icon: CalendarCheck,
-                title: "\u0417\u0430\u043F\u0438\u0448\u0438\u0442\u0435\u0441\u044C \u043D\u0430 \u0441\u0435\u0441\u0441\u0438\u044E",
+                title: "Запишитесь на сессию",
                 description:
-                  "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u0443\u0434\u043E\u0431\u043D\u043E\u0435 \u0432\u0440\u0435\u043C\u044F \u0438 \u0444\u043E\u0440\u043C\u0430\u0442. \u041E\u043F\u043B\u0430\u0442\u0438\u0442\u0435 \u043E\u043D\u043B\u0430\u0439\u043D \u0438 \u043D\u0430\u0447\u043D\u0438\u0442\u0435 \u0440\u0430\u0431\u043E\u0442\u0443.",
+                  "Выберите удобное время и формат. Оплатите онлайн и начните работу.",
               },
             ].map(({ step, icon: Icon, title, description }) => (
               <div
@@ -152,7 +152,7 @@ export default function LandingPage() {
             id="value-matching-heading"
             className="text-center text-heading-2 text-neutral-900"
           >
-            {"\u041F\u043E\u0447\u0435\u043C\u0443 \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435 \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u0435\u0439 \u0432\u0430\u0436\u043D\u043E"}
+            {"Почему совпадение ценностей важно"}
           </h2>
 
           <div className="mt-12 grid gap-8 md:grid-cols-2">
@@ -169,7 +169,7 @@ export default function LandingPage() {
                   </div>
                 </div>
                 <p className="mt-4 text-body-sm text-neutral-600">
-                  {"\u041F\u0440\u0438\u043C\u0435\u0440 \u043D\u0430\u043B\u043E\u0436\u0435\u043D\u0438\u044F \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u043D\u044B\u0445 \u043F\u0440\u043E\u0444\u0438\u043B\u0435\u0439"}
+                  {"Пример наложения ценностных профилей"}
                 </p>
               </div>
             </div>
@@ -181,10 +181,10 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <p className="text-heading-4 text-neutral-900">
-                    65% {"\u043A\u043B\u0438\u0435\u043D\u0442\u043E\u0432 \u043E\u0441\u0442\u0430\u044E\u0442\u0441\u044F"}
+                    65% {"клиентов остаются"}
                   </p>
                   <p className="mt-1 text-body-sm text-neutral-700">
-                    {"\u0441 \u043F\u0435\u0440\u0432\u044B\u043C \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u043E\u0432\u0430\u043D\u043D\u044B\u043C \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u043E\u043C"}
+                    {"с первым рекомендованным специалистом"}
                   </p>
                 </div>
               </div>
@@ -194,10 +194,10 @@ export default function LandingPage() {
                 </div>
                 <div>
                   <p className="text-heading-4 text-neutral-900">
-                    {"\u0412 2 \u0440\u0430\u0437\u0430 \u043C\u0435\u043D\u044C\u0448\u0435 \u043E\u0442\u043A\u0430\u0437\u043E\u0432"}
+                    {"В 2 раза меньше отказов"}
                   </p>
                   <p className="mt-1 text-body-sm text-neutral-700">
-                    {"\u043F\u043E\u0441\u043B\u0435 \u043F\u0435\u0440\u0432\u043E\u0439 \u0441\u0435\u0441\u0441\u0438\u0438 \u043F\u043E \u0441\u0440\u0430\u0432\u043D\u0435\u043D\u0438\u044E \u0441 \u0430\u043D\u043A\u0435\u0442\u043D\u044B\u043C \u043F\u043E\u0434\u0431\u043E\u0440\u043E\u043C"}
+                    {"после первой сессии по сравнению с анкетным подбором"}
                   </p>
                 </div>
               </div>
@@ -213,25 +213,25 @@ export default function LandingPage() {
             id="testimonials-heading"
             className="text-center text-heading-2 text-neutral-900"
           >
-            {"\u041E\u0442\u0437\u044B\u0432\u044B \u043A\u043B\u0438\u0435\u043D\u0442\u043E\u0432"}
+            {"Отзывы клиентов"}
           </h2>
 
           <div className="mt-12 grid gap-8 md:grid-cols-3">
             {[
               {
                 rating: 5,
-                text: "\u0412\u043F\u0435\u0440\u0432\u044B\u0435 \u043F\u043E\u0447\u0443\u0432\u0441\u0442\u0432\u043E\u0432\u0430\u043B\u0430, \u0447\u0442\u043E \u043C\u0435\u043D\u044F \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u043E \u043F\u043E\u043D\u044F\u043B\u0438",
-                author: "\u041C\u0430\u0440\u0438\u043D\u0430, 29",
+                text: "Впервые почувствовала, что меня действительно поняли",
+                author: "Марина, 29",
               },
               {
                 rating: 4.5,
-                text: "\u0418\u0418-\u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u043D\u0442 \u0437\u0430\u0434\u0430\u043B \u0432\u043E\u043F\u0440\u043E\u0441\u044B, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u044F \u0441\u0430\u043C \u0441\u0435\u0431\u0435 \u043D\u0435 \u0437\u0430\u0434\u0430\u0432\u0430\u043B",
-                author: "\u0410\u043B\u0435\u043A\u0441\u0435\u0439, 37",
+                text: "ИИ-консультант задал вопросы, которые я сам себе не задавал",
+                author: "Алексей, 37",
               },
               {
                 rating: 5,
-                text: "\u041D\u0430\u0448\u043B\u0430 \u0441\u0432\u043E\u0435\u0433\u043E \u043F\u0441\u0438\u0445\u043E\u043B\u043E\u0433\u0430 \u0441 \u043F\u0435\u0440\u0432\u043E\u0433\u043E \u0440\u0430\u0437\u0430. 92% \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435 \u2014 \u0438 \u044D\u0442\u043E \u0447\u0443\u0432\u0441\u0442\u0432\u0443\u0435\u0442\u0441\u044F!",
-                author: "\u041E\u043B\u044C\u0433\u0430, 34",
+                text: "Нашла своего психолога с первого раза. 92% совпадение — и это чувствуется!",
+                author: "Ольга, 34",
               },
             ].map((testimonial, i) => (
               <blockquote
@@ -261,17 +261,17 @@ export default function LandingPage() {
             id="specialist-cta-heading"
             className="text-heading-2 text-white"
           >
-            {"\u0414\u043B\u044F \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u043E\u0432"}
+            {"Для специалистов"}
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-body-lg text-primary-100">
-            {"\u041F\u043E\u043B\u0443\u0447\u0430\u0439\u0442\u0435 \u043A\u043B\u0438\u0435\u043D\u0442\u043E\u0432, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u043F\u043E\u0434\u0445\u043E\u0434\u044F\u0442 \u0438\u043C\u0435\u043D\u043D\u043E \u0432\u0430\u0448\u0435\u043C\u0443 \u043F\u043E\u0434\u0445\u043E\u0434\u0443"}
+            {"Получайте клиентов, которые подходят именно вашему подходу"}
           </p>
 
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             {[
-              "\u0426\u0435\u043D\u043D\u043E\u0441\u0442\u043D\u044B\u0439 \u043C\u0430\u0442\u0447\u0438\u043D\u0433 \u0432\u043C\u0435\u0441\u0442\u043E \u043A\u043E\u043D\u043A\u0443\u0440\u0435\u043D\u0446\u0438\u0438 \u043F\u043E \u0446\u0435\u043D\u0435",
-              "\u041A\u043B\u0438\u0435\u043D\u0442\u044B \u043F\u0440\u0438\u0445\u043E\u0434\u044F\u0442 \u0441 \u043F\u0440\u043E\u0440\u0430\u0431\u043E\u0442\u0430\u043D\u043D\u044B\u043C \u0437\u0430\u043F\u0440\u043E\u0441\u043E\u043C",
-              "\u0418\u0418 \u0441\u043E\u0437\u0434\u0430\u0451\u0442 \u0432\u0430\u0448 \u0443\u043D\u0438\u043A\u0430\u043B\u044C\u043D\u044B\u0439 \u043F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u044B\u0439 \u043F\u043E\u0440\u0442\u0440\u0435\u0442",
+              "Ценностный матчинг вместо конкуренции по цене",
+              "Клиенты приходят с проработанным запросом",
+              "ИИ создаёт ваш уникальный профессиональный портрет",
             ].map((point, i) => (
               <div
                 key={i}
@@ -291,7 +291,7 @@ export default function LandingPage() {
               asChild
             >
               <Link href="/specialist/register">
-                {"\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C\u0441\u044F \u043A\u0430\u043A \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442"}
+                {"Зарегистрироваться как специалист"}
               </Link>
             </Button>
           </div>

@@ -14,7 +14,7 @@ export function QuickReplies({
   if (replies.length === 0) return null;
 
   return (
-    <div className="flex flex-wrap gap-2 py-2 animate-fade-in" role="group" aria-label="\u0411\u044B\u0441\u0442\u0440\u044B\u0435 \u043E\u0442\u0432\u0435\u0442\u044B">
+    <div className="flex flex-wrap gap-2 py-2 animate-fade-in" role="group" aria-label="Быстрые ответы">
       {replies.map((reply) => (
         <button
           key={reply}

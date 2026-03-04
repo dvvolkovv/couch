@@ -30,7 +30,7 @@ export function MatchPercentageRing({
     <div
       className={cn("flex flex-col items-center gap-1", className)}
       role="img"
-      aria-label={`${score}% \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435`}
+      aria-label={`${score}% совпадение`}
     >
       <div className="relative" style={{ width: config.wh, height: config.wh }}>
         <svg

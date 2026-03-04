@@ -14,21 +14,21 @@ interface ConsultationSummaryProps {
 }
 
 const SPECIALIST_TYPE_LABELS = {
-  PSYCHOLOGIST: "\u041F\u0441\u0438\u0445\u043E\u043B\u043E\u0433",
-  COACH: "\u041A\u043E\u0443\u0447",
-  PSYCHOTHERAPIST: "\u041F\u0441\u0438\u0445\u043E\u0442\u0435\u0440\u0430\u043F\u0435\u0432\u0442",
+  PSYCHOLOGIST: "Психолог",
+  COACH: "Коуч",
+  PSYCHOTHERAPIST: "Психотерапевт",
 };
 
 const FREQUENCY_LABELS: Record<string, string> = {
-  weekly: "1 \u0440\u0430\u0437 \u0432 \u043D\u0435\u0434\u0435\u043B\u044E",
-  biweekly: "1 \u0440\u0430\u0437 \u0432 2 \u043D\u0435\u0434\u0435\u043B\u0438",
-  as_needed: "\u041F\u043E \u043D\u0435\u043E\u0431\u0445\u043E\u0434\u0438\u043C\u043E\u0441\u0442\u0438",
+  weekly: "1 раз в неделю",
+  biweekly: "1 раз в 2 недели",
+  as_needed: "По необходимости",
 };
 
 const FORMAT_LABELS: Record<string, string> = {
-  online: "\u041E\u043D\u043B\u0430\u0439\u043D",
-  offline: "\u041E\u0444\u043B\u0430\u0439\u043D",
-  hybrid: "\u0413\u0438\u0431\u0440\u0438\u0434",
+  online: "Онлайн",
+  offline: "Офлайн",
+  hybrid: "Гибрид",
 };
 
 export function ConsultationSummary({
@@ -42,7 +42,7 @@ export function ConsultationSummary({
       {/* Header */}
       <div className="bg-primary-50 px-6 py-4 border-b border-primary-200">
         <h3 className="text-heading-5 text-primary-900">
-          {"\u0420\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442\u044B \u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u0446\u0438\u0438"}
+          {"Результаты консультации"}
         </h3>
       </div>
 
@@ -50,13 +50,13 @@ export function ConsultationSummary({
         {/* Request summary */}
         <div>
           <h4 className="text-heading-6 text-neutral-900 mb-2">
-            {"\u0412\u0430\u0448 \u0437\u0430\u043F\u0440\u043E\u0441"}
+            {"Ваш запрос"}
           </h4>
           <p className="text-body-md text-neutral-700">
             {summary.requestSummary}
           </p>
           <p className="mt-2 text-body-sm text-neutral-600">
-            {"\u0420\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0443\u0435\u043C\u044B\u0439 \u0442\u0438\u043F: "}
+            {"Рекомендуемый тип: "}
             <span className="font-medium text-primary-700">
               {SPECIALIST_TYPE_LABELS[summary.recommendedSpecialistType]}
             </span>
@@ -66,7 +66,7 @@ export function ConsultationSummary({
         {/* Value profile chart */}
         <div>
           <h4 className="text-heading-6 text-neutral-900 mb-2">
-            {"\u0412\u0430\u0448 \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u043D\u044B\u0439 \u043F\u0440\u043E\u0444\u0438\u043B\u044C"}
+            {"Ваш ценностный профиль"}
           </h4>
           <ValueRadarChart
             clientValues={summary.valueProfile.values}
@@ -88,34 +88,34 @@ export function ConsultationSummary({
         {/* Preferences */}
         <div>
           <h4 className="text-heading-6 text-neutral-900 mb-3">
-            {"\u041F\u0440\u0435\u0434\u043F\u043E\u0447\u0442\u0435\u043D\u0438\u044F"}
+            {"Предпочтения"}
           </h4>
           <div className="grid grid-cols-2 gap-3 text-body-sm">
             <div>
-              <span className="text-neutral-600">{"\u0424\u043E\u0440\u043C\u0430\u0442:"}</span>
+              <span className="text-neutral-600">{"Формат:"}</span>
               <span className="ml-2 font-medium text-neutral-900">
                 {FORMAT_LABELS[summary.preferences.format] ||
                   summary.preferences.format}
               </span>
             </div>
             <div>
-              <span className="text-neutral-600">{"\u0411\u044E\u0434\u0436\u0435\u0442:"}</span>
+              <span className="text-neutral-600">{"Бюджет:"}</span>
               <span className="ml-2 font-medium text-neutral-900">
                 {formatPrice(summary.preferences.priceRange[0])} &mdash;{" "}
                 {formatPrice(summary.preferences.priceRange[1])}
               </span>
             </div>
             <div>
-              <span className="text-neutral-600">{"\u0427\u0430\u0441\u0442\u043E\u0442\u0430:"}</span>
+              <span className="text-neutral-600">{"Частота:"}</span>
               <span className="ml-2 font-medium text-neutral-900">
                 {FREQUENCY_LABELS[summary.preferences.frequency] ||
                   summary.preferences.frequency}
               </span>
             </div>
             <div>
-              <span className="text-neutral-600">{"\u041F\u043E\u043B:"}</span>
+              <span className="text-neutral-600">{"Пол:"}</span>
               <span className="ml-2 font-medium text-neutral-900">
-                {summary.preferences.preferredGender || "\u041D\u0435 \u0432\u0430\u0436\u0435\u043D"}
+                {summary.preferences.preferredGender || "Не важен"}
               </span>
             </div>
           </div>
@@ -125,10 +125,10 @@ export function ConsultationSummary({
       {/* Actions */}
       <div className="flex gap-3 px-6 py-4 border-t border-neutral-300 bg-neutral-50">
         <Button onClick={onConfirm} loading={loading} className="flex-1">
-          {"\u041F\u043E\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044C \u0438 \u043F\u043E\u043B\u0443\u0447\u0438\u0442\u044C \u0440\u0435\u043A\u043E\u043C\u0435\u043D\u0434\u0430\u0446\u0438\u0438"}
+          {"Подтвердить и получить рекомендации"}
         </Button>
         <Button variant="secondary" onClick={onEdit} disabled={loading}>
-          {"\u0425\u043E\u0447\u0443 \u0443\u0442\u043E\u0447\u043D\u0438\u0442\u044C"}
+          {"Хочу уточнить"}
         </Button>
       </div>
     </div>

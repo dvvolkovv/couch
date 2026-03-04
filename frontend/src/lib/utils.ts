@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat("ru-RU").format(price) + " \u20BD";
+  return new Intl.NumberFormat("ru-RU").format(price) + " ₽";
 }
 
 export function formatDate(date: string | Date): string {
@@ -32,10 +32,10 @@ export function formatShortDate(date: string | Date): string {
 }
 
 export function getMatchLabel(score: number): string {
-  if (score >= 90) return "\u041E\u0442\u043B\u0438\u0447\u043D\u043E\u0435 \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435";
-  if (score >= 80) return "\u0425\u043E\u0440\u043E\u0448\u0435\u0435 \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435";
-  if (score >= 70) return "\u0421\u0440\u0435\u0434\u043D\u0435\u0435 \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435";
-  return "\u0412\u043E\u0437\u043C\u043E\u0436\u043D\u043E\u0435 \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u0435";
+  if (score >= 90) return "Отличное совпадение";
+  if (score >= 80) return "Хорошее совпадение";
+  if (score >= 70) return "Среднее совпадение";
+  return "Возможное совпадение";
 }
 
 export function getMatchColor(score: number): string {

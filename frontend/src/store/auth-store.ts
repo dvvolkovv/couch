@@ -57,7 +57,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const message =
         (err as { response?: { data?: { error?: { message?: string } } } })
           ?.response?.data?.error?.message ||
-        "\u041E\u0448\u0438\u0431\u043A\u0430 \u0432\u0445\u043E\u0434\u0430";
+        "Ошибка входа";
       set({ error: message });
       throw err;
     }
@@ -72,7 +72,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const message =
         (err as { response?: { data?: { error?: { message?: string } } } })
           ?.response?.data?.error?.message ||
-        "\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0442\u043F\u0440\u0430\u0432\u043A\u0438 SMS";
+        "Ошибка отправки SMS";
       set({ error: message });
       throw err;
     }
@@ -91,7 +91,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const message =
         (err as { response?: { data?: { error?: { message?: string } } } })
           ?.response?.data?.error?.message ||
-        "\u041D\u0435\u0432\u0435\u0440\u043D\u044B\u0439 \u043A\u043E\u0434";
+        "Неверный код";
       set({ error: message });
       throw err;
     }
@@ -109,7 +109,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
       const message =
         (err as { response?: { data?: { error?: { message?: string } } } })
           ?.response?.data?.error?.message ||
-        "\u041E\u0448\u0438\u0431\u043A\u0430 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438";
+        "Ошибка регистрации";
       set({ error: message });
       throw err;
     }

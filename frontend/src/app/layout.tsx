@@ -14,12 +14,12 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: {
     default:
-      "SoulMate \u2014 \u041F\u043E\u0434\u0431\u043E\u0440 \u043F\u0441\u0438\u0445\u043E\u043B\u043E\u0433\u0430 \u043F\u043E \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u044F\u043C",
+      "SoulMate — Подбор психолога по ценностям",
     template:
       "%s | SoulMate",
   },
   description:
-    "\u041D\u0430\u0439\u0434\u0438\u0442\u0435 \u043F\u0441\u0438\u0445\u043E\u043B\u043E\u0433\u0430 \u0438\u043B\u0438 \u043A\u043E\u0443\u0447\u0430 \u043F\u043E \u0441\u043E\u0432\u043F\u0430\u0434\u0435\u043D\u0438\u044E \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u0435\u0439 \u0441 \u043F\u043E\u043C\u043E\u0449\u044C\u044E \u0418\u0418-\u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u043D\u0442\u0430",
+    "Найдите психолога или коуча по совпадению ценностей с помощью ИИ-консультанта",
 };
 
 export const viewport: Viewport = {

@@ -12,9 +12,9 @@ import { cn, formatPrice, getMatchColor, getMatchLabel, formatShortDate } from "
 import type { SpecialistListItem } from "@/types";
 
 const TYPE_LABELS = {
-  PSYCHOLOGIST: "\u041F\u0441\u0438\u0445\u043E\u043B\u043E\u0433",
-  COACH: "\u041A\u043E\u0443\u0447",
-  PSYCHOTHERAPIST: "\u041F\u0441\u0438\u0445\u043E\u0442\u0435\u0440\u0430\u043F\u0435\u0432\u0442",
+  PSYCHOLOGIST: "Психолог",
+  COACH: "Коуч",
+  PSYCHOTHERAPIST: "Психотерапевт",
 };
 
 interface SpecialistCardProps {
@@ -44,10 +44,10 @@ export function SpecialistCard({ specialist, className }: SpecialistCardProps) {
   const initials = `${firstName[0]}${lastName?.[0] || ""}`;
   const formatLabel =
     workFormats.includes("online")
-      ? "\u041E\u043D\u043B\u0430\u0439\u043D"
+      ? "Онлайн"
       : workFormats.includes("offline")
-        ? "\u041E\u0444\u043B\u0430\u0439\u043D"
-        : "\u0413\u0438\u0431\u0440\u0438\u0434";
+        ? "Офлайн"
+        : "Гибрид";
 
   return (
     <Card
@@ -79,7 +79,7 @@ export function SpecialistCard({ specialist, className }: SpecialistCardProps) {
             {verified && (
               <ShieldCheck
                 className="h-5 w-5 shrink-0 text-primary-500"
-                aria-label="\u041F\u0440\u043E\u0432\u0435\u0440\u0435\u043D"
+                aria-label="Проверен"
               />
             )}
           </div>
@@ -165,10 +165,10 @@ export function SpecialistCard({ specialist, className }: SpecialistCardProps) {
       {/* Actions */}
       <div className="mt-4 flex gap-3">
         <Button variant="secondary" size="sm" className="flex-1" asChild>
-          <Link href={`/catalog/${id}`}>{"\u041F\u043E\u0434\u0440\u043E\u0431\u043D\u0435\u0435"}</Link>
+          <Link href={`/catalog/${id}`}>{"Подробнее"}</Link>
         </Button>
         <Button size="sm" className="flex-1" asChild>
-          <Link href={`/catalog/${id}/book`}>{"\u0417\u0430\u0431\u0440\u043E\u043D\u0438\u0440\u043E\u0432\u0430\u0442\u044C"}</Link>
+          <Link href={`/catalog/${id}/book`}>{"Забронировать"}</Link>
         </Button>
       </div>
     </Card>

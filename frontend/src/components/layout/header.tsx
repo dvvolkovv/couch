@@ -20,22 +20,22 @@ import { useAuthStore } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
 
 const publicNav = [
-  { href: "/catalog", label: "\u041A\u0430\u0442\u0430\u043B\u043E\u0433" },
-  { href: "/how-it-works", label: "\u041A\u0430\u043A \u044D\u0442\u043E \u0440\u0430\u0431\u043E\u0442\u0430\u0435\u0442" },
-  { href: "/for-specialists", label: "\u0414\u043B\u044F \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u043E\u0432" },
+  { href: "/catalog", label: "Каталог" },
+  { href: "/how-it-works", label: "Как это работает" },
+  { href: "/for-specialists", label: "Для специалистов" },
 ];
 
 const clientNav = [
-  { href: "/catalog", label: "\u041A\u0430\u0442\u0430\u043B\u043E\u0433" },
-  { href: "/dashboard/sessions", label: "\u041C\u043E\u0438 \u0441\u0435\u0441\u0441\u0438\u0438" },
-  { href: "/dashboard/messages", label: "\u0421\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u044F" },
+  { href: "/catalog", label: "Каталог" },
+  { href: "/dashboard/sessions", label: "Мои сессии" },
+  { href: "/dashboard/messages", label: "Сообщения" },
 ];
 
 const specialistNav = [
-  { href: "/specialist/dashboard", label: "\u0414\u0430\u0448\u0431\u043E\u0440\u0434" },
-  { href: "/specialist/schedule", label: "\u0420\u0430\u0441\u043F\u0438\u0441\u0430\u043D\u0438\u0435" },
-  { href: "/specialist/clients", label: "\u041A\u043B\u0438\u0435\u043D\u0442\u044B" },
-  { href: "/specialist/messages", label: "\u0421\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u044F" },
+  { href: "/specialist/dashboard", label: "Дашборд" },
+  { href: "/specialist/schedule", label: "Расписание" },
+  { href: "/specialist/clients", label: "Клиенты" },
+  { href: "/specialist/messages", label: "Сообщения" },
 ];
 
 export function Header() {
@@ -61,7 +61,7 @@ export function Header() {
         <Link
           href="/"
           className="flex items-center gap-2 text-heading-5 font-bold text-primary-900"
-          aria-label="SoulMate - \u0413\u043B\u0430\u0432\u043D\u0430\u044F"
+          aria-label="SoulMate - Главная"
         >
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
             <span className="text-white text-btn-sm">SM</span>
@@ -70,7 +70,7 @@ export function Header() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center gap-6" aria-label="\u041E\u0441\u043D\u043E\u0432\u043D\u0430\u044F \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F">
+        <nav className="hidden md:flex items-center gap-6" aria-label="Основная навигация">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -92,7 +92,7 @@ export function Header() {
           {isAuthenticated ? (
             <>
               {/* Notifications */}
-              <Link href="/notifications" aria-label="\u0423\u0432\u0435\u0434\u043E\u043C\u043B\u0435\u043D\u0438\u044F">
+              <Link href="/notifications" aria-label="Уведомления">
                 <Button variant="ghost" size="icon-sm" className="relative">
                   <Bell className="h-5 w-5" />
                   <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-error-500 text-[10px] font-bold text-white flex items-center justify-center">
@@ -135,25 +135,25 @@ export function Header() {
                           <MenuLink
                             href="/specialist/profile"
                             icon={<User className="h-4 w-4" />}
-                            label="\u041C\u043E\u0439 \u043F\u0440\u043E\u0444\u0438\u043B\u044C"
+                            label="Мой профиль"
                             onClick={() => setUserMenuOpen(false)}
                           />
                           <MenuLink
                             href="/specialist/finances"
                             icon={<CreditCard className="h-4 w-4" />}
-                            label="\u0424\u0438\u043D\u0430\u043D\u0441\u044B"
+                            label="Финансы"
                             onClick={() => setUserMenuOpen(false)}
                           />
                           <MenuLink
                             href="/specialist/subscription"
                             icon={<CreditCard className="h-4 w-4" />}
-                            label="\u0422\u0430\u0440\u0438\u0444\u043D\u044B\u0439 \u043F\u043B\u0430\u043D"
+                            label="Тарифный план"
                             onClick={() => setUserMenuOpen(false)}
                           />
                           <MenuLink
                             href="/specialist/settings"
                             icon={<Settings className="h-4 w-4" />}
-                            label="\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
+                            label="Настройки"
                             onClick={() => setUserMenuOpen(false)}
                           />
                         </>
@@ -162,25 +162,25 @@ export function Header() {
                           <MenuLink
                             href="/profile/personal"
                             icon={<User className="h-4 w-4" />}
-                            label="\u041C\u043E\u0439 \u043F\u0440\u043E\u0444\u0438\u043B\u044C"
+                            label="Мой профиль"
                             onClick={() => setUserMenuOpen(false)}
                           />
                           <MenuLink
                             href="/dashboard/favorites"
                             icon={<Heart className="h-4 w-4" />}
-                            label="\u0418\u0437\u0431\u0440\u0430\u043D\u043D\u043E\u0435"
+                            label="Избранное"
                             onClick={() => setUserMenuOpen(false)}
                           />
                           <MenuLink
                             href="/profile/subscription"
                             icon={<CreditCard className="h-4 w-4" />}
-                            label="\u041F\u043E\u0434\u043F\u0438\u0441\u043A\u0430"
+                            label="Подписка"
                             onClick={() => setUserMenuOpen(false)}
                           />
                           <MenuLink
                             href="/profile"
                             icon={<Settings className="h-4 w-4" />}
-                            label="\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438"
+                            label="Настройки"
                             onClick={() => setUserMenuOpen(false)}
                           />
                         </>
@@ -194,7 +194,7 @@ export function Header() {
                         }}
                       >
                         <LogOut className="h-4 w-4" />
-                        \u0412\u044B\u0439\u0442\u0438
+                        Выйти
                       </button>
                     </div>
                   </>
@@ -204,10 +204,10 @@ export function Header() {
           ) : (
             <div className="hidden md:flex items-center gap-3">
               <Button variant="ghost" size="sm" asChild>
-                <Link href="/auth/login">\u0412\u043E\u0439\u0442\u0438</Link>
+                <Link href="/auth/login">Войти</Link>
               </Button>
               <Button size="sm" asChild>
-                <Link href="/consultation">\u041D\u0430\u0447\u0430\u0442\u044C \u043F\u043E\u0434\u0431\u043E\u0440</Link>
+                <Link href="/consultation">Начать подбор</Link>
               </Button>
             </div>
           )}
@@ -216,7 +216,7 @@ export function Header() {
           <button
             className="md:hidden p-2 rounded-md hover:bg-neutral-200 transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? "\u0417\u0430\u043A\u0440\u044B\u0442\u044C \u043C\u0435\u043D\u044E" : "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u043C\u0435\u043D\u044E"}
+            aria-label={mobileMenuOpen ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? (
@@ -231,7 +231,7 @@ export function Header() {
       {/* Mobile menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-neutral-300 bg-white animate-fade-in">
-          <nav className="flex flex-col p-4 gap-1" aria-label="\u041C\u043E\u0431\u0438\u043B\u044C\u043D\u0430\u044F \u043D\u0430\u0432\u0438\u0433\u0430\u0446\u0438\u044F">
+          <nav className="flex flex-col p-4 gap-1" aria-label="Мобильная навигация">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -255,14 +255,14 @@ export function Header() {
                   className="px-4 py-3 rounded-md text-body-md font-medium text-neutral-700 hover:bg-neutral-200"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  \u0412\u043E\u0439\u0442\u0438
+                  Войти
                 </Link>
                 <Link
                   href="/auth/register"
                   className="px-4 py-3 rounded-md text-body-md font-medium text-primary-700 hover:bg-primary-50"
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  \u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C\u0441\u044F
+                  Зарегистрироваться
                 </Link>
               </>
             )}

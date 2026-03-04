@@ -32,7 +32,7 @@ export function StarRating({
     <div
       className={cn("flex items-center gap-0.5", className)}
       role={interactive ? "radiogroup" : "img"}
-      aria-label={`\u0420\u0435\u0439\u0442\u0438\u043D\u0433: ${rating} \u0438\u0437 ${maxRating}`}
+      aria-label={`Рейтинг: ${rating} из ${maxRating}`}
     >
       {Array.from({ length: maxRating }, (_, i) => {
         const starValue = i + 1;
@@ -53,7 +53,7 @@ export function StarRating({
             onClick={() => interactive && onChange?.(starValue)}
             tabIndex={interactive ? 0 : -1}
             aria-label={
-              interactive ? `\u041E\u0446\u0435\u043D\u043A\u0430 ${starValue}` : undefined
+              interactive ? `Оценка ${starValue}` : undefined
             }
             role={interactive ? "radio" : undefined}
             aria-checked={interactive ? starValue === Math.round(rating) : undefined}

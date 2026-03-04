@@ -7,24 +7,24 @@ import { cn } from "@/lib/utils";
 import type { CatalogFilters } from "@/types";
 
 const SPECIALIST_TYPES = [
-  { value: "PSYCHOLOGIST", label: "\u041F\u0441\u0438\u0445\u043E\u043B\u043E\u0433" },
-  { value: "COACH", label: "\u041A\u043E\u0443\u0447" },
-  { value: "PSYCHOTHERAPIST", label: "\u041F\u0441\u0438\u0445\u043E\u0442\u0435\u0440\u0430\u043F\u0435\u0432\u0442" },
+  { value: "PSYCHOLOGIST", label: "Психолог" },
+  { value: "COACH", label: "Коуч" },
+  { value: "PSYCHOTHERAPIST", label: "Психотерапевт" },
 ];
 
 const APPROACHES = [
-  "\u041A\u041F\u0422",
-  "\u0413\u0435\u0448\u0442\u0430\u043B\u044C\u0442",
-  "\u041F\u0441\u0438\u0445\u043E\u0430\u043D\u0430\u043B\u0438\u0437",
-  "\u042D\u043A\u0437\u0438\u0441\u0442\u0435\u043D\u0446\u0438\u0430\u043B\u044C\u043D\u0430\u044F",
-  "\u041A\u043E\u0443\u0447\u0438\u043D\u0433",
+  "КПТ",
+  "Гештальт",
+  "Психоанализ",
+  "Экзистенциальная",
+  "Коучинг",
   "EMDR",
-  "\u0410\u0440\u0442-\u0442\u0435\u0440\u0430\u043F\u0438\u044F",
-  "\u0422\u0435\u043B\u0435\u0441\u043D\u0430\u044F",
+  "Арт-терапия",
+  "Телесная",
 ];
 
 const RATING_OPTIONS = [
-  { value: 0, label: "\u041B\u044E\u0431\u043E\u0439" },
+  { value: 0, label: "Любой" },
   { value: 4.0, label: "4.0+" },
   { value: 4.5, label: "4.5+" },
   { value: 4.8, label: "4.8+" },
@@ -71,14 +71,14 @@ export function SpecialistFilters({
       <div className="flex items-center justify-between">
         <h2 className="text-heading-5 text-neutral-900 flex items-center gap-2">
           <SlidersHorizontal className="h-5 w-5" />
-          {"\u0424\u0438\u043B\u044C\u0442\u0440\u044B"}
+          {"Фильтры"}
         </h2>
         {hasActiveFilters && (
           <button
             onClick={resetFilters}
             className="text-body-sm text-primary-700 hover:underline"
           >
-            {"\u0421\u0431\u0440\u043E\u0441"}
+            {"Сброс"}
           </button>
         )}
       </div>
@@ -86,7 +86,7 @@ export function SpecialistFilters({
       {/* Specialist type */}
       <fieldset>
         <legend className="text-heading-6 text-neutral-900 mb-3">
-          {"\u0422\u0438\u043F \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u0430"}
+          {"Тип специалиста"}
         </legend>
         <div className="space-y-2">
           {SPECIALIST_TYPES.map(({ value, label }) => (
@@ -111,7 +111,7 @@ export function SpecialistFilters({
       {/* Price range */}
       <fieldset>
         <legend className="text-heading-6 text-neutral-900 mb-3">
-          {"\u0426\u0435\u043D\u0430 \u0437\u0430 \u0441\u0435\u0441\u0441\u0438\u044E"}
+          {"Цена за сессию"}
         </legend>
         <div className="flex items-center gap-3">
           <input
@@ -126,7 +126,7 @@ export function SpecialistFilters({
             }
             className="w-full rounded-md border border-neutral-400 px-3 py-2 text-body-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
             min={0}
-            aria-label="\u041C\u0438\u043D\u0438\u043C\u0430\u043B\u044C\u043D\u0430\u044F \u0446\u0435\u043D\u0430"
+            aria-label="Минимальная цена"
           />
           <span className="text-neutral-500">&mdash;</span>
           <input
@@ -141,22 +141,22 @@ export function SpecialistFilters({
             }
             className="w-full rounded-md border border-neutral-400 px-3 py-2 text-body-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200"
             min={0}
-            aria-label="\u041C\u0430\u043A\u0441\u0438\u043C\u0430\u043B\u044C\u043D\u0430\u044F \u0446\u0435\u043D\u0430"
+            aria-label="Максимальная цена"
           />
         </div>
-        <p className="mt-1 text-caption text-neutral-500">{"\u0420\u0443\u0431\u043B\u0435\u0439 \u0437\u0430 \u0441\u0435\u0441\u0441\u0438\u044E"}</p>
+        <p className="mt-1 text-caption text-neutral-500">{"Рублей за сессию"}</p>
       </fieldset>
 
       {/* Format */}
       <fieldset>
         <legend className="text-heading-6 text-neutral-900 mb-3">
-          {"\u0424\u043E\u0440\u043C\u0430\u0442"}
+          {"Формат"}
         </legend>
         <div className="flex flex-wrap gap-2">
           {[
-            { value: "all", label: "\u0412\u0441\u0435" },
-            { value: "online", label: "\u041E\u043D\u043B\u0430\u0439\u043D" },
-            { value: "offline", label: "\u041E\u0444\u043B\u0430\u0439\u043D" },
+            { value: "all", label: "Все" },
+            { value: "online", label: "Онлайн" },
+            { value: "offline", label: "Офлайн" },
           ].map(({ value, label }) => (
             <button
               key={value}
@@ -177,7 +177,7 @@ export function SpecialistFilters({
       {/* Approaches */}
       <fieldset>
         <legend className="text-heading-6 text-neutral-900 mb-3">
-          {"\u041F\u043E\u0434\u0445\u043E\u0434"}
+          {"Подход"}
         </legend>
         <div className="space-y-2">
           {displayedApproaches.map((approach) => (
@@ -203,8 +203,8 @@ export function SpecialistFilters({
             onClick={() => setShowAllApproaches(!showAllApproaches)}
           >
             {showAllApproaches
-              ? "\u0421\u043A\u0440\u044B\u0442\u044C"
-              : `\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u0432\u0441\u0435 (${APPROACHES.length})`}
+              ? "Скрыть"
+              : `Показать все (${APPROACHES.length})`}
           </button>
         )}
       </fieldset>
@@ -212,7 +212,7 @@ export function SpecialistFilters({
       {/* Rating */}
       <fieldset>
         <legend className="text-heading-6 text-neutral-900 mb-3">
-          {"\u0420\u0435\u0439\u0442\u0438\u043D\u0433"}
+          {"Рейтинг"}
         </legend>
         <div className="space-y-2">
           {RATING_OPTIONS.map(({ value, label }) => (
@@ -240,13 +240,13 @@ export function SpecialistFilters({
       {/* Gender */}
       <fieldset>
         <legend className="text-heading-6 text-neutral-900 mb-3">
-          {"\u041F\u043E\u043B"}
+          {"Пол"}
         </legend>
         <div className="flex flex-wrap gap-2">
           {[
-            { value: "all", label: "\u0412\u0441\u0435" },
-            { value: "female", label: "\u0416" },
-            { value: "male", label: "\u041C" },
+            { value: "all", label: "Все" },
+            { value: "female", label: "Ж" },
+            { value: "male", label: "М" },
           ].map(({ value, label }) => (
             <button
               key={value}
