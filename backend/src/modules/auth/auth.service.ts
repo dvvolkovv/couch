@@ -3,11 +3,13 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
+import { randomInt } from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
@@ -69,7 +71,7 @@ export class AuthService {
     );
 
     // In production, send verification email here
-    this.logger.log(`Email verification token for ${dto.email}: ${verificationToken}`);
+    this.logger.log(`Email verification link sent to ${dto.email}`);
 
     return {
       userId: user.id,
@@ -94,8 +96,8 @@ export class AuthService {
       throw new BadRequestException('Too many OTP requests. Try again later.');
     }
 
-    // Generate 4-digit OTP
-    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    // Generate 6-digit OTP
+    const code = randomInt(100000, 999999).toString();
     await this.redis.set(`otp:${dto.phone}`, code, this.OTP_TTL);
     await this.redis.setJson(
       `otp_meta:${dto.phone}`,
@@ -108,7 +110,7 @@ export class AuthService {
     await this.redis.set(rateLimitKey, newAttempts.toString(), 300);
 
     // In production, send SMS here
-    this.logger.log(`OTP for ${dto.phone}: ${code}`);
+    this.logger.log(`OTP sent to ***${dto.phone.slice(-4)}`);
 
     return {
       phone: dto.phone,
@@ -212,6 +214,10 @@ export class AuthService {
       throw new UnauthorizedException('Account is suspended');
     }
 
+    if (!user.emailVerified) {
+      throw new UnauthorizedException('Email not verified. Please check your inbox for the verification link.');
+    }
+
     await this.prisma.user.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
@@ -237,10 +243,10 @@ export class AuthService {
       throw new UnauthorizedException('Phone number not registered');
     }
 
-    // Generate OTP
-    const code = Math.floor(1000 + Math.random() * 9000).toString();
+    // Generate 6-digit OTP
+    const code = randomInt(100000, 999999).toString();
     await this.redis.set(`otp:${phone}`, code, this.OTP_TTL);
-    this.logger.log(`Login OTP for ${phone}: ${code}`);
+    this.logger.log(`Login OTP sent to ***${phone.slice(-4)}`);
 
     return {
       phone,
@@ -301,6 +307,9 @@ export class AuthService {
   }
 
   async oauthGoogle(idToken: string) {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new ForbiddenException('OAuth stubs disabled in non-development environments');
+    }
     // Stub: in production, verify the Google ID token and extract user info
     this.logger.warn('Google OAuth stub: token verification skipped');
     const mockEmail = `google_user_${Date.now()}@gmail.com`;
@@ -308,6 +317,9 @@ export class AuthService {
   }
 
   async oauthVk(code: string, redirectUri: string) {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new ForbiddenException('OAuth stubs disabled in non-development environments');
+    }
     // Stub: in production, exchange code for VK access token and get user info
     this.logger.warn('VK OAuth stub: code exchange skipped');
     const mockEmail = `vk_user_${Date.now()}@vk.com`;
@@ -373,8 +385,11 @@ export class AuthService {
       'JWT_REFRESH_EXPIRATION',
       '7d',
     );
+    // Parse refreshExpiration (e.g., '7d', '30d')
+    const match = refreshExpiration.match(/^(\d+)d$/);
+    const days = match ? parseInt(match[1], 10) : 7;
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    expiresAt.setDate(expiresAt.getDate() + days);
 
     await this.prisma.refreshToken.create({
       data: {

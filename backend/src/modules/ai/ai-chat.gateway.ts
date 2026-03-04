@@ -35,7 +35,7 @@ import { AiChatService } from './ai-chat.service';
 @WebSocketGateway({
   namespace: 'ai-chat',
   cors: {
-    origin: '*',
+    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
     credentials: true,
   },
 })
@@ -87,6 +87,14 @@ export class AiChatGateway
     const userId = this.connectedUsers.get(client.id);
     if (!userId) {
       client.emit('error', { code: 'UNAUTHORIZED', message: 'Not authenticated' });
+      return;
+    }
+
+    // Verify conversation belongs to user
+    try {
+      await this.aiChatService.getConsultation(userId, data.conversationId);
+    } catch {
+      client.emit('error', { code: 'FORBIDDEN', message: 'Not authorized for this conversation' });
       return;
     }
 

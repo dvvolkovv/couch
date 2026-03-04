@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { Public } from '../../common/decorators/public.decorator';
 import {
@@ -27,6 +28,7 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register/email')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Register with email and password' })
@@ -35,6 +37,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register/phone')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Start phone registration (sends SMS code)' })
@@ -75,6 +78,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login/email')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with email and password' })
@@ -91,6 +95,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login/phone')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Start phone login (sends SMS code)' })
@@ -99,6 +104,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('oauth/google')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'OAuth login via Google' })
@@ -115,6 +121,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('oauth/vk')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'OAuth login via VK' })

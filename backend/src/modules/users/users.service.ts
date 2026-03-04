@@ -54,16 +54,13 @@ export class UsersService {
   }
 
   async updateMe(userId: string, dto: UpdateUserDto) {
-    const user = await this.prisma.user.update({
+    const data = Object.fromEntries(
+      Object.entries(dto).filter(([_, v]) => v !== undefined),
+    );
+
+    await this.prisma.user.update({
       where: { id: userId },
-      data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        age: dto.age,
-        gender: dto.gender,
-        city: dto.city,
-        timezone: dto.timezone,
-      },
+      data,
     });
 
     return this.getMe(userId);

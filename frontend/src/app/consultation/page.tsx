@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { io, Socket } from "socket.io-client";
 import { Send, ArrowLeft, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChatBubble } from "@/components/chat/chat-bubble";
@@ -13,14 +14,17 @@ import { CrisisAlert } from "@/components/chat/crisis-alert";
 import { Progress } from "@/components/ui/progress";
 import { useConsultationStore } from "@/store/consultation-store";
 import { useAuthStore } from "@/store/auth-store";
-import { apiClient } from "@/lib/api-client";
+import { apiClient, getAccessToken } from "@/lib/api-client";
 import { formatTime } from "@/lib/utils";
 import type { ChatMessage, ConsultationSummary as SummaryType } from "@/types";
+
+const WS_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3200";
 
 export default function ConsultationPage() {
   const router = useRouter();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const socketRef = useRef<Socket | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [showProgress, setShowProgress] = useState(false);
   const [crisisAlertOpen, setCrisisAlertOpen] = useState(false);
@@ -42,6 +46,8 @@ export default function ConsultationPage() {
     setQuickReplies,
     setResult,
     setStatus,
+    appendStreamToken,
+    finalizeStream,
     reset,
   } = useConsultationStore();
 
@@ -54,7 +60,7 @@ export default function ConsultationPage() {
   useEffect(() => {
     if (authLoading) return;
     if (!isAuthenticated) {
-      router.push("/auth/register?redirect=/consultation");
+      router.push("/auth/login?redirect=/consultation");
       return;
     }
     if (!conversationId) {
@@ -62,24 +68,80 @@ export default function ConsultationPage() {
     }
   }, [isAuthenticated, authLoading, conversationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // WebSocket connection
+  useEffect(() => {
+    if (!conversationId || conversationId.startsWith("demo")) return;
+
+    const token = getAccessToken();
+    if (!token) return;
+
+    const socket = io(`${WS_URL}/ai-chat`, {
+      auth: { token },
+      transports: ["websocket", "polling"],
+    });
+
+    socketRef.current = socket;
+
+    socket.on("connect", () => {
+      socket.emit("join_conversation", { conversationId });
+    });
+
+    socket.on("ai_stream_start", () => {
+      setAiTyping(true);
+    });
+
+    socket.on("ai_stream_token", (data: { token: string }) => {
+      appendStreamToken(data.token);
+    });
+
+    socket.on("ai_stream_end", (data: { messageId: string; fullContent: string }) => {
+      finalizeStream(data.messageId, data.fullContent);
+    });
+
+    socket.on("phase_changed", (data: { phase: string }) => {
+      setPhase(data.phase as any);
+    });
+
+    socket.on("summary_ready", (data: { summary: any }) => {
+      setResult(data.summary);
+      setStatus("COMPLETED");
+    });
+
+    socket.on("crisis_detected", () => {
+      setCrisisAlertOpen(true);
+    });
+
+    socket.on("error", (data: { code: string; message: string }) => {
+      console.error("WebSocket error:", data);
+    });
+
+    return () => {
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [conversationId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const startConsultation = async () => {
     try {
       const { data } = await apiClient.post("/ai/consultations", {
         type: "CLIENT_CONSULTATION",
       });
-      const conv = data.data;
+      const conv = data.data || data;
       setConversation(conv.conversationId, "CLIENT_CONSULTATION");
       if (conv.initialMessage) {
-        addMessage(conv.initialMessage);
+        addMessage({
+          ...conv.initialMessage,
+          phase: conv.initialMessage.phase || "GREETING",
+          metadata: null,
+        });
       }
     } catch {
-      // Demo mode: simulate initial message
+      // Fallback: create local conversation for demo
       setConversation("demo-conv-1", "CLIENT_CONSULTATION");
       addMessage({
         id: "msg-1",
         role: "assistant",
-        content:
-          "\u0417\u0434\u0440\u0430\u0432\u0441\u0442\u0432\u0443\u0439\u0442\u0435! \u042F \u2014 \u0418\u0418-\u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u043D\u0442 SoulMate.\n\n\u042F \u043F\u043E\u043C\u043E\u0433\u0443 \u0440\u0430\u0437\u043E\u0431\u0440\u0430\u0442\u044C\u0441\u044F \u0432 \u0432\u0430\u0448\u0435\u043C \u0437\u0430\u043F\u0440\u043E\u0441\u0435 \u0438 \u043F\u043E\u0434\u043E\u0431\u0440\u0430\u0442\u044C \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u0430, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043B\u044C\u043D\u043E \u0432\u0430\u043C \u043F\u043E\u0434\u0445\u043E\u0434\u0438\u0442. \u041D\u0430\u0448 \u0440\u0430\u0437\u0433\u043E\u0432\u043E\u0440 \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E \u043A\u043E\u043D\u0444\u0438\u0434\u0435\u043D\u0446\u0438\u0430\u043B\u0435\u043D.\n\n\u0420\u0430\u0441\u0441\u043A\u0430\u0436\u0438\u0442\u0435, \u0447\u0442\u043E \u043F\u0440\u0438\u0432\u0435\u043B\u043E \u0432\u0430\u0441 \u043A \u0440\u0435\u0448\u0435\u043D\u0438\u044E \u043E\u0431\u0440\u0430\u0442\u0438\u0442\u044C\u0441\u044F \u043A \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u0443?",
+        content: "Здравствуйте! Я — ИИ-консультант SoulMate.\n\nЯ помогу разобраться в вашем запросе и подобрать специалиста, который действительно вам подходит. Наш разговор полностью конфиденциален.\n\nРасскажите, что привело вас к решению обратиться к специалисту?",
         phase: "GREETING",
         metadata: null,
         createdAt: new Date().toISOString(),
@@ -103,116 +165,18 @@ export default function ConsultationPage() {
       addMessage(userMessage);
       setInputValue("");
       setQuickReplies([]);
-      setAiTyping(true);
 
-      try {
-        // In production, this would go through WebSocket.
-        // For now we call the REST API as a fallback.
-        const { data } = await apiClient.post(
-          `/ai/consultations/${conversationId}/messages`,
-          { content: content.trim() }
-        );
-
-        const response = data.data;
-        if (response.phase) setPhase(response.phase);
-        if (response.message) addMessage(response.message);
-        if (response.quickReplies) setQuickReplies(response.quickReplies);
-        if (response.crisisDetected) setCrisisAlertOpen(true);
-        if (response.summary) {
-          setResult(response.summary);
-          setStatus("COMPLETED");
-        }
-      } catch {
-        // Demo: simulate AI response
-        setTimeout(() => {
-          simulateAiResponse(content);
-        }, 1200);
+      // Send via WebSocket if connected
+      if (socketRef.current?.connected && conversationId && !conversationId.startsWith("demo")) {
+        setAiTyping(true);
+        socketRef.current.emit("send_message", {
+          conversationId,
+          content: content.trim(),
+        });
       }
     },
-    [conversationId, phase, isAiTyping, addMessage, setAiTyping, setPhase, setQuickReplies, setResult, setStatus]
+    [conversationId, phase, isAiTyping, addMessage, setAiTyping, setQuickReplies],
   );
-
-  const simulateAiResponse = (userInput: string) => {
-    const phaseResponses: Record<string, { content: string; nextPhase?: string; quickReplies?: string[] }> = {
-      GREETING: {
-        content: `\u0421\u043F\u0430\u0441\u0438\u0431\u043E, \u0447\u0442\u043E \u043F\u043E\u0434\u0435\u043B\u0438\u043B\u0438\u0441\u044C. \u042D\u0442\u043E \u0432\u0430\u0436\u043D\u044B\u0439 \u0448\u0430\u0433 \u2014 \u043E\u0431\u0440\u0430\u0442\u0438\u0442\u044C \u0432\u043D\u0438\u043C\u0430\u043D\u0438\u0435 \u043D\u0430 \u0441\u0432\u043E\u0451 \u0441\u043E\u0441\u0442\u043E\u044F\u043D\u0438\u0435.\n\n\u041A\u0430\u043A \u0434\u0430\u0432\u043D\u043E \u0432\u044B \u0437\u0430\u043C\u0435\u0447\u0430\u0435\u0442\u0435 \u044D\u0442\u0438 \u0447\u0443\u0432\u0441\u0442\u0432\u0430?`,
-        nextPhase: "REQUEST_EXPLORATION",
-      },
-      REQUEST_EXPLORATION: {
-        content: `\u041F\u043E\u043D\u0438\u043C\u0430\u044E. \u0422\u0435\u043F\u0435\u0440\u044C \u044F \u0445\u043E\u0442\u0435\u043B \u0431\u044B \u043B\u0443\u0447\u0448\u0435 \u043F\u043E\u043D\u044F\u0442\u044C \u0432\u0430\u0448\u0438 \u0446\u0435\u043D\u043D\u043E\u0441\u0442\u0438, \u0447\u0442\u043E\u0431\u044B \u043F\u043E\u0434\u043E\u0431\u0440\u0430\u0442\u044C \u0438\u043C\u0435\u043D\u043D\u043E \u0432\u0430\u0448\u0435\u0433\u043E \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442\u0430.\n\n\u0427\u0442\u043E \u0434\u043B\u044F \u0432\u0430\u0441 \u043E\u0437\u043D\u0430\u0447\u0430\u0435\u0442 \u0443\u0441\u043F\u0435\u0448\u043D\u0430\u044F \u0436\u0438\u0437\u043D\u044C?`,
-        nextPhase: "VALUE_INTERVIEW",
-      },
-      VALUE_INTERVIEW: {
-        content: `\u041E\u0442\u043B\u0438\u0447\u043D\u043E, \u0441\u043F\u0430\u0441\u0438\u0431\u043E \u0437\u0430 \u043E\u0442\u043A\u0440\u044B\u0442\u043E\u0441\u0442\u044C.\n\n\u0422\u0435\u043F\u0435\u0440\u044C \u043D\u0435\u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0432\u043E\u043F\u0440\u043E\u0441\u043E\u0432 \u043E \u0444\u043E\u0440\u043C\u0430\u0442\u0435. \u041A\u0430\u043A\u043E\u0439 \u0444\u043E\u0440\u043C\u0430\u0442 \u0440\u0430\u0431\u043E\u0442\u044B \u0432\u0430\u043C \u0443\u0434\u043E\u0431\u043D\u0435\u0435?`,
-        nextPhase: "PREFERENCES",
-        quickReplies: ["\u041E\u043D\u043B\u0430\u0439\u043D", "\u041E\u0444\u043B\u0430\u0439\u043D", "\u0413\u0438\u0431\u0440\u0438\u0434"],
-      },
-      PREFERENCES: {
-        content: `\u0421\u043F\u0430\u0441\u0438\u0431\u043E! \u0412\u043E\u0442 \u0447\u0442\u043E \u044F \u043F\u043E\u043D\u044F\u043B \u043E \u0432\u0430\u0448\u0435\u043C \u0437\u0430\u043F\u0440\u043E\u0441\u0435:`,
-        nextPhase: "CONFIRMATION",
-      },
-    };
-
-    const response = phaseResponses[phase] || phaseResponses["GREETING"];
-
-    if (response.nextPhase) {
-      setPhase(response.nextPhase as any);
-    }
-
-    const aiMsg: ChatMessage = {
-      id: `ai-${Date.now()}`,
-      role: "assistant",
-      content: response.content,
-      phase: (response.nextPhase || phase) as any,
-      metadata: response.quickReplies
-        ? { quickReplies: response.quickReplies }
-        : null,
-      createdAt: new Date().toISOString(),
-    };
-
-    addMessage(aiMsg);
-    if (response.quickReplies) setQuickReplies(response.quickReplies);
-    setAiTyping(false);
-
-    // If phase reached CONFIRMATION, show the summary
-    if (response.nextPhase === "CONFIRMATION") {
-      setTimeout(() => {
-        setResult({
-          requestSummary:
-            "\u0412\u044B \u043F\u0435\u0440\u0435\u0436\u0438\u0432\u0430\u0435\u0442\u0435 \u043F\u0440\u043E\u0444\u0435\u0441\u0441\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E\u0435 \u0432\u044B\u0433\u043E\u0440\u0430\u043D\u0438\u0435 \u0438 \u0445\u043E\u0442\u0438\u0442\u0435 \u043F\u043E\u043D\u044F\u0442\u044C \u0435\u0433\u043E \u0433\u043B\u0443\u0431\u0438\u043D\u043D\u044B\u0435 \u043F\u0440\u0438\u0447\u0438\u043D\u044B. \u0412\u0430\u043C \u043D\u0443\u0436\u0435\u043D \u0441\u043F\u0435\u0446\u0438\u0430\u043B\u0438\u0441\u0442, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u043F\u043E\u043C\u043E\u0436\u0435\u0442 \u0440\u0430\u0437\u043E\u0431\u0440\u0430\u0442\u044C\u0441\u044F \u0432 \u043F\u0440\u0438\u043E\u0440\u0438\u0442\u0435\u0442\u0430\u0445 \u0438 \u0432\u043E\u0441\u0441\u0442\u0430\u043D\u043E\u0432\u0438\u0442\u044C \u043C\u043E\u0442\u0438\u0432\u0430\u0446\u0438\u044E.",
-          requestType: "therapy",
-          recommendedSpecialistType: "PSYCHOLOGIST",
-          valueProfile: {
-            values: {
-              career: 0.75,
-              family: 0.6,
-              freedom: 0.85,
-              security: 0.4,
-              development: 0.9,
-              relationships: 0.65,
-              health: 0.7,
-              creativity: 0.55,
-            },
-            communicationStyle: {
-              directive_vs_supportive: 0.3,
-              analytical_vs_intuitive: 0.7,
-              structured_vs_free: 0.6,
-              past_vs_future: 0.5,
-            },
-            summary:
-              "\u0412\u0430\u043C \u0432\u0430\u0436\u043D\u044B \u0441\u0432\u043E\u0431\u043E\u0434\u0430 \u0438 \u0440\u0430\u0437\u0432\u0438\u0442\u0438\u0435. \u0412\u044B \u043F\u0440\u0435\u0434\u043F\u043E\u0447\u0438\u0442\u0430\u0435\u0442\u0435 \u043F\u043E\u0434\u0434\u0435\u0440\u0436\u0438\u0432\u0430\u044E\u0449\u0438\u0439, \u043D\u043E \u0430\u043D\u0430\u043B\u0438\u0442\u0438\u0447\u0435\u0441\u043A\u0438\u0439 \u043F\u043E\u0434\u0445\u043E\u0434.",
-          },
-          preferences: {
-            format: "online",
-            priceRange: [2000, 4000],
-            frequency: "weekly",
-            preferredGender: null,
-            preferredTime: "evening",
-          },
-        });
-      }, 500);
-    }
-  };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -226,23 +190,22 @@ export default function ConsultationPage() {
       await apiClient.post(`/ai/consultations/${conversationId}/confirm`, {
         corrections: null,
       });
-      router.push("/consultation/results");
+      router.push("/matching");
     } catch {
-      // Demo mode
-      router.push("/consultation/results");
+      router.push("/matching");
     }
   };
 
-  const currentStep =
-    phase === "GREETING"
-      ? 1
-      : phase === "REQUEST_EXPLORATION"
-        ? 2
-        : phase === "VALUE_INTERVIEW"
-          ? 3
-          : phase === "PREFERENCES"
-            ? 4
-            : 5;
+  const phaseSteps: Record<string, number> = {
+    GREETING: 1,
+    SITUATION_EXPLORATION: 2,
+    VALUE_ASSESSMENT: 3,
+    FORMAT_PREFERENCES: 4,
+    SUMMARY: 5,
+    CONFIRMATION: 6,
+  };
+  const currentStep = phaseSteps[phase] || 1;
+  const totalSteps = 6;
 
   if (authLoading) {
     return (
@@ -261,31 +224,27 @@ export default function ConsultationPage() {
             <button
               onClick={() => router.push("/")}
               className="text-neutral-600 hover:text-neutral-900 transition-colors"
-              aria-label="\u041D\u0430\u0437\u0430\u0434"
+              aria-label="Назад"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-heading-5 text-neutral-900">
-                {"\u0418\u0418-\u043A\u043E\u043D\u0441\u0443\u043B\u044C\u0442\u0430\u0446\u0438\u044F"}
-              </h1>
+              <h1 className="text-heading-5 text-neutral-900">ИИ-консультация</h1>
               <p className="text-caption text-neutral-600">
-                {"\u0428\u0430\u0433 "}{currentStep}{" \u0438\u0437 5"}
+                Шаг {currentStep} из {totalSteps}
               </p>
             </div>
           </div>
-          {/* Mobile progress toggle */}
           <button
             className="md:hidden rounded-md p-2 text-neutral-600 hover:bg-neutral-200"
             onClick={() => setShowProgress(!showProgress)}
-            aria-label="\u041F\u043E\u043A\u0430\u0437\u0430\u0442\u044C \u043F\u0440\u043E\u0433\u0440\u0435\u0441\u0441"
+            aria-label="Показать прогресс"
           >
             <BarChart3 className="h-5 w-5" />
           </button>
         </div>
-        {/* Mobile progress bar */}
         <div className="mt-3 md:hidden">
-          <Progress value={(currentStep / 5) * 100} />
+          <Progress value={(currentStep / totalSteps) * 100} />
         </div>
       </div>
 
@@ -313,7 +272,6 @@ export default function ConsultationPage() {
               <TypingIndicator />
             ) : null}
 
-            {/* Quick replies */}
             {quickReplies.length > 0 && !isAiTyping && (
               <div className="flex justify-start pl-11">
                 <QuickReplies
@@ -324,7 +282,6 @@ export default function ConsultationPage() {
               </div>
             )}
 
-            {/* Summary card */}
             {result && status === "COMPLETED" && (
               <div className="max-w-lg mx-auto">
                 <ConsultationSummary
@@ -332,7 +289,7 @@ export default function ConsultationPage() {
                   onConfirm={handleConfirmSummary}
                   onEdit={() => {
                     setStatus("ACTIVE");
-                    setPhase("VALUE_INTERVIEW");
+                    setPhase("VALUE_ASSESSMENT");
                   }}
                 />
               </div>
@@ -351,16 +308,15 @@ export default function ConsultationPage() {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder={"\u0412\u0430\u0448 \u043E\u0442\u0432\u0435\u0442..."}
+                    placeholder="Ваш ответ..."
                     className="w-full resize-none rounded-xl border border-neutral-400 bg-white px-4 py-3 pr-12 text-body-md text-neutral-950 placeholder:text-neutral-500 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-200 max-h-32"
                     rows={1}
                     disabled={isAiTyping}
-                    aria-label="\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0435"
+                    aria-label="Введите сообщение"
                     onInput={(e) => {
                       const target = e.target as HTMLTextAreaElement;
                       target.style.height = "auto";
-                      target.style.height =
-                        Math.min(target.scrollHeight, 128) + "px";
+                      target.style.height = Math.min(target.scrollHeight, 128) + "px";
                     }}
                   />
                 </div>
@@ -369,7 +325,7 @@ export default function ConsultationPage() {
                   className="h-11 w-11 rounded-xl shrink-0"
                   onClick={() => sendMessage(inputValue)}
                   disabled={!inputValue.trim() || isAiTyping}
-                  aria-label="\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C"
+                  aria-label="Отправить"
                 >
                   <Send className="h-5 w-5" />
                 </Button>
@@ -379,9 +335,7 @@ export default function ConsultationPage() {
         </div>
 
         {/* Desktop sidebar with progress */}
-        <aside
-          className={`w-80 shrink-0 border-l border-neutral-300 bg-white p-6 overflow-y-auto hidden md:block`}
-        >
+        <aside className="w-80 shrink-0 border-l border-neutral-300 bg-white p-6 overflow-y-auto hidden md:block">
           <ChatProgress currentPhase={phase} />
         </aside>
 
@@ -399,7 +353,6 @@ export default function ConsultationPage() {
         )}
       </div>
 
-      {/* Crisis alert modal */}
       <CrisisAlert
         open={crisisAlertOpen}
         onSafe={() => setCrisisAlertOpen(false)}

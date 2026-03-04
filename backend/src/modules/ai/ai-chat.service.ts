@@ -523,15 +523,25 @@ export class AiChatService {
       return { shouldTransition: false, nextPhase: null };
     }
 
-    // Transition if we hit the maximum exchanges for this phase
+    const currentIndex = phases.indexOf(currentPhase as any);
+    if (currentIndex < 0 || currentIndex >= phases.length - 1) {
+      return { shouldTransition: false, nextPhase: null };
+    }
+
+    // Force transition when exchanges >= max
     if (exchangeCount >= phaseLimit.max) {
-      const currentIndex = phases.indexOf(currentPhase as any);
-      if (currentIndex >= 0 && currentIndex < phases.length - 1) {
-        return {
-          shouldTransition: true,
-          nextPhase: phases[currentIndex + 1],
-        };
-      }
+      return {
+        shouldTransition: true,
+        nextPhase: phases[currentIndex + 1],
+      };
+    }
+
+    // Allow transition when exchanges >= min (based on LLM signal - for now auto-transition)
+    if (exchangeCount >= phaseLimit.min) {
+      return {
+        shouldTransition: true,
+        nextPhase: phases[currentIndex + 1],
+      };
     }
 
     return { shouldTransition: false, nextPhase: null };
@@ -592,12 +602,21 @@ export class AiChatService {
   private isConfirmation(content: string): boolean {
     const confirmPhrases = [
       'da', 'yes', 'confirm', 'correct', 'right', 'ok', 'okay',
-      'yes', 'agree', 'that is right', 'everything is correct',
+      'agree', 'that is right', 'everything is correct',
+      'да', 'подтверждаю', 'верно', 'правильно', 'всё верно', 'все верно', 'согласен', 'согласна',
+    ];
+    const rejectionPhrases = [
+      'no', 'net', 'wrong', 'not correct', 'ne tak',
+      'нет', 'неправильно', 'не так', 'не верно', 'неверно',
     ];
     const normalized = content.toLowerCase().trim();
-    return (
-      confirmPhrases.some((p) => normalized.includes(p)) ||
-      normalized.length < 20
-    );
+
+    // Check rejections first
+    if (rejectionPhrases.some((p) => normalized.includes(p))) {
+      return false;
+    }
+
+    // Only confirm on exact match of confirmation phrases
+    return confirmPhrases.some((p) => normalized.includes(p));
   }
 }

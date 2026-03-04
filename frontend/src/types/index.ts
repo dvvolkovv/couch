@@ -108,11 +108,14 @@ export type ConsultationType =
 
 export type ConsultationPhase =
   | "GREETING"
-  | "REQUEST_EXPLORATION"
-  | "VALUE_INTERVIEW"
-  | "PREFERENCES"
-  | "CONFIRMATION"
-  | "COMPLETED";
+  | "SITUATION_EXPLORATION"
+  | "VALUE_ASSESSMENT"
+  | "FORMAT_PREFERENCES"
+  | "PROFESSIONAL_BACKGROUND"
+  | "WORK_STYLE"
+  | "CASE_QUESTIONS"
+  | "SUMMARY"
+  | "CONFIRMATION";
 
 export type MessageRole = "assistant" | "user" | "system";
 

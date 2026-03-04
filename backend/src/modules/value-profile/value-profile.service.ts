@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { EmbeddingService } from './embedding.service';
 
@@ -72,11 +73,7 @@ export class ValueProfileService {
 
     // Store embedding using raw SQL (pgvector)
     const embeddingStr = `[${embedding.join(',')}]`;
-    await this.prisma.$executeRawUnsafe(
-      `UPDATE value_profiles SET embedding = $1::vector WHERE id = $2`,
-      embeddingStr,
-      profile.id,
-    );
+    await this.prisma.$executeRaw`UPDATE value_profiles SET embedding = ${embeddingStr}::vector WHERE id = ${profile.id}`;
 
     this.logger.log(`Value profile ${existing ? 'updated' : 'created'} for user ${userId}`);
 
