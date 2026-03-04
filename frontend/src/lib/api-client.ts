@@ -2,7 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
   ? `${process.env.NEXT_PUBLIC_API_URL}/v1`
-  : 'http://localhost:3200/v1';
+  : '/api/v1';
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,

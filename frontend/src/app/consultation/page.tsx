@@ -18,7 +18,7 @@ import { apiClient, getAccessToken } from "@/lib/api-client";
 import { formatTime } from "@/lib/utils";
 import type { ChatMessage, ConsultationSummary as SummaryType } from "@/types";
 
-const WS_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3200";
+const WS_URL = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? window.location.origin : "http://localhost:3200");
 
 export default function ConsultationPage() {
   const router = useRouter();
