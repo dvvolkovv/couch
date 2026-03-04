@@ -54,6 +54,7 @@ export class AuthService {
       data: {
         email: dto.email,
         passwordHash,
+        emailVerified: true,
         role: dto.role,
         firstName: dto.firstName,
         authProvider: 'EMAIL',
@@ -212,10 +213,6 @@ export class AuthService {
 
     if (user.isBanned) {
       throw new UnauthorizedException('Account is suspended');
-    }
-
-    if (!user.emailVerified) {
-      throw new UnauthorizedException('Email not verified. Please check your inbox for the verification link.');
     }
 
     await this.prisma.user.update({
