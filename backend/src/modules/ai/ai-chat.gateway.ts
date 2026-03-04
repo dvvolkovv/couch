@@ -184,9 +184,28 @@ export class AiChatGateway
 
       // Emit summary if conversation is complete
       if (result.isComplete && result.extractedProfile) {
+        const profile = result.extractedProfile;
+        // Transform ExtractedValueProfile → ConsultationSummary format expected by frontend
+        const summary = {
+          requestSummary: profile.requestSummary || '',
+          requestType: profile.requestType || 'therapy',
+          recommendedSpecialistType: this.mapRequestTypeToSpecialist(profile.requestType),
+          valueProfile: {
+            values: profile.values,
+            communicationStyle: profile.communicationStyle,
+            summary: profile.summaryText,
+          },
+          preferences: {
+            format: 'online',
+            priceRange: [2000, 5000],
+            frequency: 'weekly',
+            preferredGender: null,
+            preferredTime: 'evening',
+          },
+        };
         this.server.to(room).emit('summary_ready', {
           conversationId: data.conversationId,
-          summary: result.extractedProfile,
+          summary,
         });
       }
     } catch (error: any) {
@@ -197,6 +216,15 @@ export class AiChatGateway
         code: 'PROCESSING_ERROR',
         message: 'Failed to process message. Please try again.',
       });
+    }
+  }
+
+  private mapRequestTypeToSpecialist(requestType?: string): string {
+    switch (requestType) {
+      case 'coaching': return 'COACH';
+      case 'crisis': return 'PSYCHOTHERAPIST';
+      case 'therapy':
+      default: return 'PSYCHOLOGIST';
     }
   }
 

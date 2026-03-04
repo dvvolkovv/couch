@@ -13,7 +13,7 @@ interface ConsultationSummaryProps {
   loading?: boolean;
 }
 
-const SPECIALIST_TYPE_LABELS = {
+const SPECIALIST_TYPE_LABELS: Record<string, string> = {
   PSYCHOLOGIST: "Психолог",
   COACH: "Коуч",
   PSYCHOTHERAPIST: "Психотерапевт",
@@ -37,6 +37,11 @@ export function ConsultationSummary({
   onEdit,
   loading,
 }: ConsultationSummaryProps) {
+  const values = summary?.valueProfile?.values ?? summary?.values ?? {};
+  const preferences = summary?.preferences ?? {};
+  const priceRange = preferences?.priceRange ?? [0, 0];
+  const specialistType = summary?.recommendedSpecialistType ?? "PSYCHOLOGIST";
+
   return (
     <div className="rounded-xl border border-primary-200 bg-white shadow-lg overflow-hidden animate-fade-in">
       {/* Header */}
@@ -53,73 +58,81 @@ export function ConsultationSummary({
             {"Ваш запрос"}
           </h4>
           <p className="text-body-md text-neutral-700">
-            {summary.requestSummary}
+            {summary?.requestSummary || "Запрос сформирован на основе вашей консультации."}
           </p>
           <p className="mt-2 text-body-sm text-neutral-600">
             {"Рекомендуемый тип: "}
             <span className="font-medium text-primary-700">
-              {SPECIALIST_TYPE_LABELS[summary.recommendedSpecialistType]}
+              {SPECIALIST_TYPE_LABELS[specialistType] || "Психолог"}
             </span>
           </p>
         </div>
 
         {/* Value profile chart */}
-        <div>
-          <h4 className="text-heading-6 text-neutral-900 mb-2">
-            {"Ваш ценностный профиль"}
-          </h4>
-          <ValueRadarChart
-            clientValues={summary.valueProfile.values}
-            showLegend={false}
-            height={220}
-          />
-          <div className="flex flex-wrap gap-1.5 mt-3">
-            {Object.entries(summary.valueProfile.values)
-              .sort(([, a], [, b]) => b - a)
-              .slice(0, 4)
-              .map(([key]) => (
-                <Badge key={key} variant="default">
-                  {key}
-                </Badge>
-              ))}
+        {Object.keys(values).length > 0 && (
+          <div>
+            <h4 className="text-heading-6 text-neutral-900 mb-2">
+              {"Ваш ценностный профиль"}
+            </h4>
+            <ValueRadarChart
+              clientValues={values}
+              showLegend={false}
+              height={220}
+            />
+            <div className="flex flex-wrap gap-1.5 mt-3">
+              {Object.entries(values)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 4)
+                .map(([key]) => (
+                  <Badge key={key} variant="default">
+                    {key}
+                  </Badge>
+                ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Preferences */}
-        <div>
-          <h4 className="text-heading-6 text-neutral-900 mb-3">
-            {"Предпочтения"}
-          </h4>
-          <div className="grid grid-cols-2 gap-3 text-body-sm">
-            <div>
-              <span className="text-neutral-600">{"Формат:"}</span>
-              <span className="ml-2 font-medium text-neutral-900">
-                {FORMAT_LABELS[summary.preferences.format] ||
-                  summary.preferences.format}
-              </span>
-            </div>
-            <div>
-              <span className="text-neutral-600">{"Бюджет:"}</span>
-              <span className="ml-2 font-medium text-neutral-900">
-                {formatPrice(summary.preferences.priceRange[0])} &mdash;{" "}
-                {formatPrice(summary.preferences.priceRange[1])}
-              </span>
-            </div>
-            <div>
-              <span className="text-neutral-600">{"Частота:"}</span>
-              <span className="ml-2 font-medium text-neutral-900">
-                {FREQUENCY_LABELS[summary.preferences.frequency] ||
-                  summary.preferences.frequency}
-              </span>
-            </div>
-            <div>
-              <span className="text-neutral-600">{"Пол:"}</span>
-              <span className="ml-2 font-medium text-neutral-900">
-                {summary.preferences.preferredGender || "Не важен"}
-              </span>
+        {Object.keys(preferences).length > 0 && (
+          <div>
+            <h4 className="text-heading-6 text-neutral-900 mb-3">
+              {"Предпочтения"}
+            </h4>
+            <div className="grid grid-cols-2 gap-3 text-body-sm">
+              {preferences.format && (
+                <div>
+                  <span className="text-neutral-600">{"Формат:"}</span>
+                  <span className="ml-2 font-medium text-neutral-900">
+                    {FORMAT_LABELS[preferences.format] || preferences.format}
+                  </span>
+                </div>
+              )}
+              {priceRange[0] > 0 && (
+                <div>
+                  <span className="text-neutral-600">{"Бюджет:"}</span>
+                  <span className="ml-2 font-medium text-neutral-900">
+                    {formatPrice(priceRange[0])} &mdash;{" "}
+                    {formatPrice(priceRange[1])}
+                  </span>
+                </div>
+              )}
+              {preferences.frequency && (
+                <div>
+                  <span className="text-neutral-600">{"Частота:"}</span>
+                  <span className="ml-2 font-medium text-neutral-900">
+                    {FREQUENCY_LABELS[preferences.frequency] || preferences.frequency}
+                  </span>
+                </div>
+              )}
+              <div>
+                <span className="text-neutral-600">{"Пол:"}</span>
+                <span className="ml-2 font-medium text-neutral-900">
+                  {preferences.preferredGender || "Не важен"}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Actions */}
