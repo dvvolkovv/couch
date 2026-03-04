@@ -95,7 +95,10 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         setAccessToken(null);
-        if (typeof window !== "undefined") {
+        // Don't redirect if this was a silent auth check (e.g. /users/me on page load)
+        const url = originalRequest.url || "";
+        const isSilentAuth = url.includes("/users/me");
+        if (typeof window !== "undefined" && !isSilentAuth) {
           window.location.href = "/auth/login";
         }
         return Promise.reject(refreshError);
