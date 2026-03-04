@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Bell } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Уведомления — SoulMate",
+  title: "Уведомления — Hearty",
 };
 
 export default function NotificationsPage() {

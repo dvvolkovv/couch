@@ -61,7 +61,7 @@ async function bootstrap() {
   const nodeEnv = configService.get<string>('NODE_ENV', 'development');
   if (nodeEnv !== 'production') {
     const swaggerConfig = new DocumentBuilder()
-      .setTitle('SoulMate API')
+      .setTitle('Hearty API')
       .setDescription('AI-powered psychologist/coach matching platform')
       .setVersion('1.0')
       .addBearerAuth()

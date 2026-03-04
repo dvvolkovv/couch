@@ -145,7 +145,7 @@ export class AiChatService {
       type: conversation.type,
       status: conversation.status,
       phase: conversation.phase,
-      wsUrl: `wss://api.soulmate.ru/ws/ai-chat?conversationId=${conversation.id}`,
+      wsUrl: `wss://api.hearty.pro/ws/ai-chat?conversationId=${conversation.id}`,
       initialMessage: {
         id: initialMessage.id,
         role: initialMessage.role,

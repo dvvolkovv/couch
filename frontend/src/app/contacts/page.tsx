@@ -8,27 +8,27 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Контакты — SoulMate",
+  title: "Контакты — Hearty",
   description:
-    "Свяжитесь с командой SoulMate. Email поддержки: support@soulmate.ru. Ответим в течение 24 часов.",
+    "Свяжитесь с командой Hearty. Email поддержки: support@hearty.pro. Ответим в течение 24 часов.",
 };
 
 const contacts = [
   {
     icon: Mail,
     title: "Поддержка клиентов",
-    value: "support@soulmate.ru",
+    value: "support@hearty.pro",
     description: "Вопросы по подбору специалистов, работе сервиса, подписке",
-    href: "mailto:support@soulmate.ru",
+    href: "mailto:support@hearty.pro",
     colorClass: "bg-primary-100",
     iconColor: "text-primary-600",
   },
   {
     icon: Mail,
     title: "Для специалистов",
-    value: "specialists@soulmate.ru",
+    value: "specialists@hearty.pro",
     description: "Регистрация, верификация, тарифы и вопросы по работе на платформе",
-    href: "mailto:specialists@soulmate.ru",
+    href: "mailto:specialists@hearty.pro",
     colorClass: "bg-success-100",
     iconColor: "text-success-600",
   },
@@ -43,7 +43,7 @@ const contacts = [
 ];
 
 const socials = [
-  { name: "Telegram", handle: "@soulmate_ru", href: "https://t.me/soulmate_ru" },
+  { name: "Telegram", handle: "@hearty_pro", href: "https://t.me/hearty_pro" },
   { name: "ВКонтакте", handle: "vk.com/soulmaters", href: "https://vk.com/soulmaters" },
 ];
 

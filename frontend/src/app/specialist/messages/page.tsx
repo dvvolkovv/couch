@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Сообщения — SoulMate",
+  title: "Сообщения — Hearty",
 };
 
 export default function SpecialistMessagesPage() {

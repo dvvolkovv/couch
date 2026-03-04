@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DollarSign, TrendingUp, CreditCard } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Финансы — SoulMate",
+  title: "Финансы — Hearty",
 };
 
 const stats = [

@@ -13,9 +13,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Premium для клиентов — SoulMate",
+  title: "Premium для клиентов — Hearty",
   description:
-    "SoulMate Premium: неограниченные AI-консультации, расширенный матчинг Top-10, приоритетная запись и персональный менеджер. 990 руб/мес.",
+    "Hearty Premium: неограниченные AI-консультации, расширенный матчинг Top-10, приоритетная запись и персональный менеджер. 990 руб/мес.",
 };
 
 const comparison = [

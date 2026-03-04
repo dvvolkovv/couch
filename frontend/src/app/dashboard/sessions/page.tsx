@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Мои сессии — SoulMate",
+  title: "Мои сессии — Hearty",
 };
 
 export default function SessionsPage() {

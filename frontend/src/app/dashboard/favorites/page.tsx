@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Heart } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Избранные специалисты — SoulMate",
+  title: "Избранные специалисты — Hearty",
 };
 
 export default function FavoritesPage() {

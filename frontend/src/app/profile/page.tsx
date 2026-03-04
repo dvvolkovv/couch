@@ -3,7 +3,7 @@ import Link from "next/link";
 import { User, CreditCard, Settings, ChevronRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Настройки профиля — SoulMate",
+  title: "Настройки профиля — Hearty",
 };
 
 const sections = [

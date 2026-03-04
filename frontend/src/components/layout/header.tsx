@@ -61,12 +61,12 @@ export function Header() {
         <Link
           href="/"
           className="flex items-center gap-2 text-heading-5 font-bold text-primary-900"
-          aria-label="SoulMate - Главная"
+          aria-label="Hearty - Главная"
         >
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
-            <span className="text-white text-btn-sm">SM</span>
+            <span className="text-white text-btn-sm">H</span>
           </div>
-          <span className="hidden sm:inline">SoulMate</span>
+          <span className="hidden sm:inline">Hearty</span>
         </Link>
 
         {/* Desktop Navigation */}

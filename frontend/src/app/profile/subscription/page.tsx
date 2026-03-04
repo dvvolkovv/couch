@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle2, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Подписка — SoulMate",
+  title: "Подписка — Hearty",
 };
 
 export default function ProfileSubscriptionPage() {

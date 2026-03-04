@@ -16,7 +16,7 @@ import {
 export const metadata: Metadata = {
   title: "Для специалистов — психологов и коучей",
   description:
-    "Получайте клиентов, которые подходят вашему подходу. Регистрируйтесь на SoulMate как психолог или коуч.",
+    "Получайте клиентов, которые подходят вашему подходу. Регистрируйтесь на Hearty как психолог или коуч.",
 };
 
 const benefits = [
@@ -104,7 +104,7 @@ export default function ForSpecialistsPage() {
                 <span className="gradient-text">{"подходят вашему подходу"}</span>
               </h1>
               <p className="mt-6 text-body-lg text-neutral-700 max-w-lg">
-                {"SoulMate подбирает клиентов не по цене или рейтингу, а по совпадению ценностей. Вы работаете с теми, кому действительно нужен именно ваш подход."}
+                {"Hearty подбирает клиентов не по цене или рейтингу, а по совпадению ценностей. Вы работаете с теми, кому действительно нужен именно ваш подход."}
               </p>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <Button size="lg" className="text-btn-lg" asChild>
@@ -144,7 +144,7 @@ export default function ForSpecialistsPage() {
             id="spec-benefits-heading"
             className="text-center text-heading-2 text-neutral-900"
           >
-            {"Почему специалисты выбирают SoulMate"}
+            {"Почему специалисты выбирают Hearty"}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-center text-body-lg text-neutral-600">
             {"Меньше времени на маркетинг — больше времени на работу с клиентами"}
@@ -233,7 +233,7 @@ export default function ForSpecialistsPage() {
       >
         <div className="mx-auto max-w-container px-4 text-center md:px-8">
           <h2 id="spec-cta-heading" className="text-heading-2 text-white">
-            {"Присоединяйтесь к SoulMate"}
+            {"Присоединяйтесь к Hearty"}
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-body-lg text-primary-100">
             {"Более 500 специалистов уже работают с клиентами через нашу платформу"}

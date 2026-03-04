@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Users, Calendar, Star, DollarSign } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Дашборд специалиста — SoulMate",
+  title: "Дашборд специалиста — Hearty",
 };
 
 const stats = [

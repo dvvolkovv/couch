@@ -48,7 +48,7 @@ function LoginForm() {
     <div className="mx-auto max-w-md px-4 py-16">
       <h1 className="text-heading-2 text-neutral-900 text-center">Вход</h1>
       <p className="mt-2 text-body-md text-neutral-600 text-center">
-        Войдите в свой аккаунт SoulMate
+        Войдите в свой аккаунт Hearty
       </p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-4">

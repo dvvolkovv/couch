@@ -1,7 +1,7 @@
 {
-  "name": "soulmate-api",
+  "name": "hearty-api",
   "version": "1.0.0",
-  "description": "SoulMate API - AI-powered psychologist/coach matching platform",
+  "description": "Hearty API - AI-powered psychologist/coach matching platform",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {

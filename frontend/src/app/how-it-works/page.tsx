@@ -14,9 +14,9 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Как работает SoulMate",
+  title: "Как работает Hearty",
   description:
-    "Узнайте, как ИИ-консультант SoulMate помогает найти психолога или коуча по совпадению ценностей за 3 простых шага.",
+    "Узнайте, как ИИ-консультант Hearty помогает найти психолога или коуча по совпадению ценностей за 3 простых шага.",
 };
 
 const steps = [
@@ -115,7 +115,7 @@ export default function HowItWorksPage() {
             className="text-display-lg md:text-display-xl text-primary-900"
           >
             {"Как работает "}
-            <span className="gradient-text">{"SoulMate"}</span>
+            <span className="gradient-text">{"Hearty"}</span>
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-body-lg text-neutral-700">
             {"Мы используем ИИ, чтобы понять ваши ценности — и найти специалиста, с которым вы действительно сможете работать, а не просто ближайшего свободного."}

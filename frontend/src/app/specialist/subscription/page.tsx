@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Тарифный план — SoulMate",
+  title: "Тарифный план — Hearty",
 };
 
 export default function SpecialistSubscriptionPage() {

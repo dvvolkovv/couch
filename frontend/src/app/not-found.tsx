@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, SearchX } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Страница не найдена — SoulMate",
+  title: "Страница не найдена — Hearty",
 };
 
 export default function NotFound() {

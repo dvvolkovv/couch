@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Users } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Клиенты — SoulMate",
+  title: "Клиенты — Hearty",
 };
 
 export default function SpecialistClientsPage() {

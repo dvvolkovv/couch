@@ -12,9 +12,9 @@ export function Footer() {
               className="flex items-center gap-2 text-heading-5 font-bold text-primary-900"
             >
               <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
-                <span className="text-white text-btn-sm">SM</span>
+                <span className="text-white text-btn-sm">H</span>
               </div>
-              SoulMate
+              Hearty
             </Link>
             <p className="mt-3 text-body-sm text-neutral-700">
               {"Подбор психологов и коучей по совпадению ценностей с помощью ИИ"}
@@ -123,7 +123,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-neutral-300 pt-6 text-center">
           <p className="text-caption text-neutral-600">
-            {"© 2026 SoulMate. Все права защищены."}
+            {"© 2026 Hearty. Все права защищены."}
           </p>
           <p className="mt-1 text-caption text-neutral-500">
             {"Сервис не является медицинским учреждением."}
