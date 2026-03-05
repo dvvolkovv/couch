@@ -3,6 +3,7 @@ import {
   IsString,
   MinLength,
   IsOptional,
+  IsNotEmpty,
   IsBoolean,
   IsEnum,
   Matches,
@@ -18,8 +19,8 @@ export class RegisterEmailDto {
   password: string;
 
   @IsString()
-  @IsOptional()
-  firstName?: string;
+  @IsNotEmpty()
+  firstName: string;
 
   @IsEnum(['CLIENT', 'SPECIALIST'])
   role: 'CLIENT' | 'SPECIALIST';
@@ -80,4 +81,18 @@ export class OAuthVkDto {
 
   @IsString()
   redirectUri: string;
+}
+
+export class ForgotPasswordDto {
+  @IsEmail()
+  email: string;
+}
+
+export class ResetPasswordDto {
+  @IsString()
+  token: string;
+
+  @IsString()
+  @MinLength(8)
+  newPassword: string;
 }

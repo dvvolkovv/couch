@@ -20,6 +20,8 @@ import {
   LoginPhoneDto,
   OAuthGoogleDto,
   OAuthVkDto,
+  ForgotPasswordDto,
+  ResetPasswordDto,
 } from './dto/auth.dto';
 
 @ApiTags('Auth')
@@ -155,6 +157,23 @@ export class AuthController {
     const refreshToken = res.req.cookies?.['refresh_token'];
     await this.authService.logout(refreshToken);
     res.clearCookie('refresh_token', { path: '/v1/auth' });
+  }
+
+  @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Post('forgot-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Send password reset email' })
+  async forgotPassword(@Body() dto: ForgotPasswordDto) {
+    return this.authService.forgotPassword(dto.email);
+  }
+
+  @Public()
+  @Post('reset-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password with token' })
+  async resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto.token, dto.newPassword);
   }
 
   private setRefreshTokenCookie(res: Response, token: string) {

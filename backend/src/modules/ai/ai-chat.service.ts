@@ -221,6 +221,65 @@ export class AiChatService {
   }
 
   /**
+   * Get messages for a consultation.
+   */
+  async getConsultationMessages(userId: string, conversationId: string) {
+    const conversation = await this.prisma.aIConversation.findFirst({
+      where: { id: conversationId, userId },
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Consultation not found');
+    }
+
+    const messages = await this.prisma.aIMessage.findMany({
+      where: { conversationId },
+      orderBy: { createdAt: 'asc' },
+      select: {
+        id: true,
+        role: true,
+        content: true,
+        phase: true,
+        metadata: true,
+        createdAt: true,
+      },
+    });
+
+    return {
+      conversationId,
+      messages,
+      total: messages.length,
+    };
+  }
+
+  /**
+   * Cancel an active consultation.
+   */
+  async cancelConsultation(userId: string, conversationId: string) {
+    const conversation = await this.prisma.aIConversation.findFirst({
+      where: { id: conversationId, userId, status: 'ACTIVE' },
+    });
+
+    if (!conversation) {
+      throw new NotFoundException('Active consultation not found');
+    }
+
+    await this.prisma.aIConversation.update({
+      where: { id: conversationId },
+      data: {
+        status: 'ABANDONED',
+        completedAt: new Date(),
+      },
+    });
+
+    return {
+      conversationId,
+      status: 'CANCELLED',
+      message: 'Consultation cancelled successfully',
+    };
+  }
+
+  /**
    * Process a user message in an active conversation.
    * This is the core AI interaction handler.
    *

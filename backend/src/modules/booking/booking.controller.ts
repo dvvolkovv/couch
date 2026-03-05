@@ -84,4 +84,15 @@ export class BookingController {
   ) {
     return this.bookingService.rescheduleBooking(user.sub, id, dto);
   }
+
+  @Patch(':id/reschedule')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reschedule a booking (PATCH)' })
+  async rescheduleBookingPatch(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: RescheduleBookingDto,
+  ) {
+    return this.bookingService.rescheduleBooking(user.sub, id, dto);
+  }
 }

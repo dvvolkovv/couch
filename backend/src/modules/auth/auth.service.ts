@@ -304,6 +304,38 @@ export class AuthService {
       });
   }
 
+  async forgotPassword(email: string) {
+    const user = await this.prisma.user.findUnique({ where: { email } });
+    // Always return success to prevent email enumeration
+    if (!user || !user.passwordHash) {
+      return { message: 'If an account with that email exists, a password reset link has been sent.' };
+    }
+
+    const resetToken = uuidv4();
+    await this.redis.set(`password_reset:${resetToken}`, user.id, 3600); // 1 hour
+
+    await this.emailService.sendPasswordResetEmail(email, resetToken);
+
+    return { message: 'If an account with that email exists, a password reset link has been sent.' };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const userId = await this.redis.get(`password_reset:${token}`);
+    if (!userId) {
+      throw new BadRequestException('Invalid or expired reset token');
+    }
+
+    await this.redis.del(`password_reset:${token}`);
+
+    const passwordHash = await bcrypt.hash(newPassword, this.BCRYPT_ROUNDS);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { passwordHash },
+    });
+
+    return { message: 'Password has been reset successfully' };
+  }
+
   async oauthGoogle(idToken: string) {
     if (process.env.NODE_ENV !== 'development') {
       throw new ForbiddenException('OAuth stubs disabled in non-development environments');

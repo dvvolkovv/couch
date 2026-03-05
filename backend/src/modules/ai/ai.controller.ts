@@ -46,6 +46,25 @@ export class AiController {
     return this.aiChatService.getConsultation(user.sub, id);
   }
 
+  @Get('consultations/:id/messages')
+  @ApiOperation({ summary: 'Get messages for a consultation' })
+  async getConsultationMessages(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ) {
+    return this.aiChatService.getConsultationMessages(user.sub, id);
+  }
+
+  @Post('consultations/:id/cancel')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Cancel an active consultation' })
+  async cancelConsultation(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+  ) {
+    return this.aiChatService.cancelConsultation(user.sub, id);
+  }
+
   @Post('consultations/:id/confirm')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Confirm consultation results' })

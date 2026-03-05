@@ -12,6 +12,9 @@ import { MatchingModule } from './modules/matching/matching.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { ValueProfileModule } from './modules/value-profile/value-profile.module';
 import { EmailModule } from './common/email/email.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { PaymentsModule } from './modules/payments/payments.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -35,6 +38,9 @@ import { EmailModule } from './common/email/email.module';
     MatchingModule,
     BookingModule,
     ValueProfileModule,
+    NotificationsModule,
+    PaymentsModule,
+    ReviewsModule,
   ],
   providers: [
     {
