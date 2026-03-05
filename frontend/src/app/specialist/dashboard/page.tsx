@@ -56,6 +56,22 @@ export default function SpecialistDashboardPage() {
         ))}
       </div>
 
+      <div className="rounded-xl border border-primary-200 bg-primary-50 p-8 text-center mb-6">
+        <div className="text-3xl mb-3">🎤</div>
+        <p className="text-body-lg text-neutral-900 font-semibold mb-2">
+          {"Пройдите ИИ-интервью"}
+        </p>
+        <p className="text-body-sm text-neutral-600 mb-4">
+          {"ИИ-интервью поможет создать ваш ценностный портрет для точного подбора клиентов. Займёт 20–40 минут."}
+        </p>
+        <a
+          href="/specialist/interview"
+          className="inline-flex items-center justify-center rounded-xl bg-primary-600 px-6 py-3 text-body-md font-semibold text-white hover:bg-primary-700 transition-colors"
+        >
+          Начать интервью
+        </a>
+      </div>
+
       <div className="rounded-xl border border-neutral-300 bg-neutral-50 p-8 text-center">
         <p className="text-body-lg text-neutral-700 mb-2">
           {"Ваш профиль ещё не активирован"}

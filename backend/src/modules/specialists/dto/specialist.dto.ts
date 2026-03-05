@@ -8,8 +8,7 @@ import {
   Max,
   ArrayMinSize,
 } from 'class-validator';
-
-const SPECIALIST_TYPES = ['PSYCHOLOGIST', 'COACH', 'PSYCHOTHERAPIST'] as const;
+import { SpecialistType } from '@prisma/client';
 
 export class ApplySpecialistDto {
   @IsEnum(['PSYCHOLOGIST', 'COACH', 'PSYCHOTHERAPIST'])
@@ -84,9 +83,9 @@ export class UpdateSpecialistDto {
 }
 
 export class CatalogQueryDto {
-  @IsEnum(SPECIALIST_TYPES)
+  @IsEnum(SpecialistType)
   @IsOptional()
-  type?: string;
+  type?: SpecialistType;
 
   @IsArray()
   @IsString({ each: true })

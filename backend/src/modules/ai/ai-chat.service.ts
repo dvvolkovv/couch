@@ -600,23 +600,24 @@ export class AiChatService {
    * Simple heuristic to detect if user is confirming the summary.
    */
   private isConfirmation(content: string): boolean {
-    const confirmPhrases = [
-      'da', 'yes', 'confirm', 'correct', 'right', 'ok', 'okay',
-      'agree', 'that is right', 'everything is correct',
-      'да', 'подтверждаю', 'верно', 'правильно', 'всё верно', 'все верно', 'согласен', 'согласна',
-    ];
-    const rejectionPhrases = [
-      'no', 'net', 'wrong', 'not correct', 'ne tak',
-      'нет', 'неправильно', 'не так', 'не верно', 'неверно',
-    ];
     const normalized = content.toLowerCase().trim();
 
-    // Check rejections first
-    if (rejectionPhrases.some((p) => normalized.includes(p))) {
+    // Explicit rejection patterns — checked first, using word boundaries
+    const rejectionPatterns = [
+      /\bno\b/, /\bnot\b/, /\bwrong\b/, /\bnope\b/, /\bnet\b/, /\bne tak\b/,
+      /\bнет\b/, /\bне так\b/, /\bне верно\b/, /\bневерно\b/, /\bнеправильно\b/,
+    ];
+    if (rejectionPatterns.some((p) => p.test(normalized))) {
       return false;
     }
 
-    // Only confirm on exact match of confirmation phrases
-    return confirmPhrases.some((p) => normalized.includes(p));
+    // Confirmation patterns — only match if rejection patterns didn't fire
+    const confirmPatterns = [
+      /\byes\b/, /\bda\b/, /\bok\b/, /\bokay\b/, /\bconfirm\b/, /\bcorrect\b/,
+      /\bright\b/, /\bagree\b/, /\bthat is right\b/, /\beverything is correct\b/,
+      /\bда\b/, /\bподтверждаю\b/, /\bверно\b/, /\bправильно\b/,
+      /\bвсё верно\b/, /\bвсе верно\b/, /\bсогласен\b/, /\bсогласна\b/,
+    ];
+    return confirmPatterns.some((p) => p.test(normalized));
   }
 }

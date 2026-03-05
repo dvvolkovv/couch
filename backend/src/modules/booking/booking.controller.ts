@@ -12,7 +12,7 @@ import {
 import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 import { BookingService } from './booking.service';
 import { ScheduleService } from './schedule.service';
-import { CreateBookingDto, CancelBookingDto, SlotsQueryDto } from './dto/booking.dto';
+import { CreateBookingDto, CancelBookingDto, RescheduleBookingDto, SlotsQueryDto } from './dto/booking.dto';
 import { CurrentUser, JwtPayload } from '../../common/decorators/current-user.decorator';
 
 @ApiTags('Bookings')
@@ -72,5 +72,16 @@ export class BookingController {
     @Body() dto: CancelBookingDto,
   ) {
     return this.bookingService.cancelBooking(user.sub, id, dto);
+  }
+
+  @Post(':id/reschedule')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reschedule a booking' })
+  async rescheduleBooking(
+    @CurrentUser() user: JwtPayload,
+    @Param('id') id: string,
+    @Body() dto: RescheduleBookingDto,
+  ) {
+    return this.bookingService.rescheduleBooking(user.sub, id, dto);
   }
 }

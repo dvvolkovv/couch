@@ -13,6 +13,7 @@ import { randomInt } from 'node:crypto';
 import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { RedisService } from '../../common/redis/redis.service';
+import { EmailService } from '../../common/email/email.service';
 import { JwtPayload } from '../../common/decorators/current-user.decorator';
 import {
   RegisterEmailDto,
@@ -33,6 +34,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly redis: RedisService,
+    private readonly emailService: EmailService,
   ) {}
 
   async registerEmail(dto: RegisterEmailDto) {
@@ -71,8 +73,7 @@ export class AuthService {
       86400, // 24 hours
     );
 
-    // In production, send verification email here
-    this.logger.log(`Email verification link sent to ${dto.email}`);
+    await this.emailService.sendVerificationEmail(dto.email, verificationToken);
 
     return {
       userId: user.id,

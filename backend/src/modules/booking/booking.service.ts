@@ -6,7 +6,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { CreateBookingDto, CancelBookingDto } from './dto/booking.dto';
+import { CreateBookingDto, CancelBookingDto, RescheduleBookingDto } from './dto/booking.dto';
 
 @Injectable()
 export class BookingService {
@@ -185,6 +185,54 @@ export class BookingService {
     return {
       bookingId: updated.id,
       status: updated.status,
+    };
+  }
+
+  async rescheduleBooking(userId: string, bookingId: string, dto: RescheduleBookingDto) {
+    const booking = await this.prisma.booking.findFirst({
+      where: {
+        id: bookingId,
+        clientId: userId,
+        status: { in: ['CONFIRMED', 'PENDING_PAYMENT'] },
+      },
+    });
+
+    if (!booking) {
+      throw new NotFoundException('Booking not found or cannot be rescheduled');
+    }
+
+    const newSlotStart = new Date(dto.newSlotStart);
+    const newSlotEnd = new Date(newSlotStart.getTime() + booking.duration * 60 * 1000);
+
+    // Check for conflicts with new slot
+    const conflict = await this.prisma.booking.findFirst({
+      where: {
+        specialistId: booking.specialistId,
+        id: { not: bookingId },
+        status: { in: ['CONFIRMED', 'PENDING_PAYMENT'] },
+        slotStart: { lt: newSlotEnd },
+        slotEnd: { gt: newSlotStart },
+      },
+    });
+
+    if (conflict) {
+      throw new ConflictException('This time slot is already booked');
+    }
+
+    const updated = await this.prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        slotStart: newSlotStart,
+        slotEnd: newSlotEnd,
+        status: 'PENDING_PAYMENT',
+      },
+    });
+
+    return {
+      bookingId: updated.id,
+      status: updated.status,
+      slotStart: updated.slotStart.toISOString(),
+      slotEnd: updated.slotEnd.toISOString(),
     };
   }
 }

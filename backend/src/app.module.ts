@@ -11,6 +11,7 @@ import { AiModule } from './modules/ai/ai.module';
 import { MatchingModule } from './modules/matching/matching.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { ValueProfileModule } from './modules/value-profile/value-profile.module';
+import { EmailModule } from './common/email/email.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ValueProfileModule } from './modules/value-profile/value-profile.module
     ]),
     PrismaModule,
     RedisModule,
+    EmailModule,
     AuthModule,
     UsersModule,
     SpecialistsModule,

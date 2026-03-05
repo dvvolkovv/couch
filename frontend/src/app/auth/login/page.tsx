@@ -20,8 +20,8 @@ type LoginForm = z.infer<typeof loginSchema>;
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect") || "/dashboard";
-  const { login, error } = useAuthStore();
+  const redirect = searchParams.get("redirect");
+  const { login, error, user } = useAuthStore();
   const [loading, setLoading] = useState(false);
 
   const {
@@ -36,7 +36,9 @@ function LoginForm() {
     setLoading(true);
     try {
       await login(data.email, data.password);
-      router.push(redirect);
+      const currentUser = useAuthStore.getState().user;
+      const defaultRedirect = currentUser?.role === "SPECIALIST" ? "/specialist/dashboard" : "/dashboard";
+      router.push(redirect || defaultRedirect);
     } catch {
       // error is set in store
     } finally {
