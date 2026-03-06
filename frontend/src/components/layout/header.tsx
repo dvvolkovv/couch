@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bell,
   Menu,
@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { useAuthStore } from "@/store/auth-store";
 import { cn } from "@/lib/utils";
+import { apiClient } from "@/lib/api-client";
 
 const publicNav = [
   { href: "/catalog", label: "Каталог" },
@@ -43,6 +44,23 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const fetchUnread = async () => {
+      try {
+        const { data } = await apiClient.get("/notifications/unread-count");
+        const result = data.data || data;
+        setUnreadCount(result.unreadCount || 0);
+      } catch {
+        // silently ignore — badge will stay at 0
+      }
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 30000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   const navItems = !isAuthenticated
     ? publicNav
@@ -95,9 +113,11 @@ export function Header() {
               <Link href="/notifications" aria-label="Уведомления">
                 <Button variant="ghost" size="icon-sm" className="relative">
                   <Bell className="h-5 w-5" />
-                  <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-error-500 text-[10px] font-bold text-white flex items-center justify-center">
-                    3
-                  </span>
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full bg-error-500 text-[10px] font-bold text-white flex items-center justify-center">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
 

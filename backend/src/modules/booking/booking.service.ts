@@ -7,12 +7,16 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreateBookingDto, CancelBookingDto, RescheduleBookingDto } from './dto/booking.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class BookingService {
   private readonly logger = new Logger(BookingService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly notificationsService: NotificationsService,
+  ) {}
 
   async createBooking(userId: string, dto: CreateBookingDto) {
     const specialist = await this.prisma.specialistProfile.findUnique({
@@ -63,6 +67,21 @@ export class BookingService {
         },
       },
     });
+
+    // Notify specialist about new booking
+    try {
+      await this.notificationsService.create({
+        userId: specialist.userId,
+        type: 'NEW_BOOKING',
+        title: 'Новая запись',
+        body: `Новая запись на ${slotStart.toLocaleDateString('ru-RU')} в ${slotStart.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`,
+        channel: 'in_app',
+        entityType: 'booking',
+        entityId: booking.id,
+      });
+    } catch (err) {
+      this.logger.warn(`Failed to create notification for booking ${booking.id}: ${err}`);
+    }
 
     return {
       bookingId: booking.id,
@@ -181,6 +200,27 @@ export class BookingService {
         cancelReason: dto.reason,
       },
     });
+
+    // Notify specialist about cancellation
+    try {
+      const cancelledBooking = await this.prisma.booking.findUnique({
+        where: { id: bookingId },
+        include: { specialist: { select: { userId: true } } },
+      });
+      if (cancelledBooking) {
+        await this.notificationsService.create({
+          userId: cancelledBooking.specialist.userId,
+          type: 'BOOKING_CANCELLED',
+          title: 'Запись отменена',
+          body: 'Клиент отменил запись',
+          channel: 'in_app',
+          entityType: 'booking',
+          entityId: bookingId,
+        });
+      }
+    } catch (err) {
+      this.logger.warn(`Failed to create cancellation notification: ${err}`);
+    }
 
     return {
       bookingId: updated.id,

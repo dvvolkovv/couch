@@ -271,6 +271,54 @@ export interface Notification {
   createdAt: string;
 }
 
+// --- Messages ---
+
+export interface MessageThread {
+  threadId: string;
+  participant: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl?: string;
+  } | null;
+  lastMessage: {
+    id: string;
+    content: string;
+    senderId: string;
+    createdAt: string;
+  } | null;
+  unreadCount: number;
+  lastMessageAt: string;
+}
+
+export interface DirectMessage {
+  id: string;
+  content: string;
+  senderId: string;
+  senderName: string;
+  fileUrl?: string;
+  fileName?: string;
+  readAt: string | null;
+  createdAt: string;
+}
+
+export interface ThreadDetail {
+  threadId: string;
+  participant: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    avatarUrl?: string;
+  } | null;
+  messages: DirectMessage[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
+  };
+}
+
 // --- Pagination ---
 
 export interface Pagination {

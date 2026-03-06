@@ -15,6 +15,7 @@ import { EmailModule } from './common/email/email.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { PaymentsModule } from './modules/payments/payments.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { MessagesModule } from './modules/messages/messages.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     NotificationsModule,
     PaymentsModule,
     ReviewsModule,
+    MessagesModule,
   ],
   providers: [
     {

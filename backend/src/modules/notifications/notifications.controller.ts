@@ -4,10 +4,11 @@ import {
   Patch,
   Delete,
   Param,
+  Query,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CurrentUser, JwtPayload } from '../../common/decorators/current-user.decorator';
 
@@ -19,8 +20,31 @@ export class NotificationsController {
 
   @Get()
   @ApiOperation({ summary: 'Get user notifications' })
-  async getNotifications(@CurrentUser() user: JwtPayload) {
-    return this.notificationsService.getNotifications(user.sub);
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async getNotifications(
+    @CurrentUser() user: JwtPayload,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
+  ) {
+    return this.notificationsService.getNotifications(
+      user.sub,
+      page ? +page : 1,
+      limit ? +limit : 20,
+    );
+  }
+
+  @Get('unread-count')
+  @ApiOperation({ summary: 'Get unread notifications count' })
+  async getUnreadCount(@CurrentUser() user: JwtPayload) {
+    return this.notificationsService.getUnreadCount(user.sub);
+  }
+
+  @Patch('read-all')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Mark all notifications as read' })
+  async markAllAsRead(@CurrentUser() user: JwtPayload) {
+    return this.notificationsService.markAllAsRead(user.sub);
   }
 
   @Patch(':id/read')
