@@ -144,7 +144,8 @@ export class ScheduleService {
 
     const currentDate = new Date(fromDate);
     while (currentDate <= toDate) {
-      const dayOfWeek = (currentDate.getDay() + 6) % 7; // Convert to Mon=0
+      // ISO weekday: Mon=1..Sat=6, Sun=7 — matches DB storage convention
+      const dayOfWeek = currentDate.getDay() === 0 ? 7 : currentDate.getDay();
       const dateStr = currentDate.toISOString().split('T')[0];
 
       const daySlots = recurringSlots.filter(

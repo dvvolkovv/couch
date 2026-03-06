@@ -8,6 +8,7 @@ import {
   Max,
   ArrayMinSize,
 } from 'class-validator';
+import { Type } from 'class-transformer';
 import { SpecialistType } from '@prisma/client';
 
 export class ApplySpecialistDto {
@@ -132,6 +133,7 @@ export class CatalogQueryDto {
   @IsOptional()
   cursor?: string;
 
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(50)
